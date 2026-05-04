@@ -67,6 +67,7 @@ dev_dependencies:
   retrofit_generator: ^8.1.0
   hive_generator: ^2.0.1
   riverpod_generator: ^2.3.0
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
   uses-material-design: true
@@ -76,3 +77,13 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/lottie/
+
+# ── App Icon Configuration ─────────────────────────────────────────────────
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/company_logo.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/company_logo.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true

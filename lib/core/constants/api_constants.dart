@@ -1,38 +1,24 @@
 /// API constants for Win HR application.
-/// Update [baseUrl] with your Oracle APEX ORDS server URL.
+/// Connected to Oracle APEX ORDS server.
 class ApiConstants {
   ApiConstants._();
 
   // ── Base URL ──────────────────────────────────────────────────────────
   static const String baseUrl =
-      'https://your-apex-server.com/ords/hr_app/v1/';
+      'http://deltamansoura.ddns.net:9090/ords/deltaamaindata/';
 
   // ── Timeouts ──────────────────────────────────────────────────────────
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
   // ── Auth ───────────────────────────────────────────────────────────────
-  static const String login = 'auth/login';
-  static const String refreshToken = 'auth/refresh';
-  static const String logout = 'auth/logout';
+  static const String login = 'authenticate/login';
 
-  // ── Attendance ─────────────────────────────────────────────────────────
-  static const String checkin = 'attendance/checkin';
-  static const String checkout = 'attendance/checkout';
-  static const String attendanceHistory = 'attendance/history';
-  static const String attendanceStats = 'attendance/stats';
+  // ── Employees ──────────────────────────────────────────────────────────
+  static const String employees = 'Query/EmployeeList';
 
-  // ── Leaves ─────────────────────────────────────────────────────────────
-  static const String leaves = 'leaves';
-  static const String leaveBalance = 'leaves/balance';
-  static const String leaveTypes = 'leaves/types';
-
-  // ── Shifts ─────────────────────────────────────────────────────────────
-  static const String shifts = 'shifts';
-  static const String shiftChangeRequest = 'shifts/change-request';
-  static const String shiftChangeRequests = 'shifts/change-requests';
-
-  // ── Profile ────────────────────────────────────────────────────────────
-  static const String profile = 'employee/profile';
-  static const String notifications = 'notifications';
+  // ── Leave Requests ─────────────────────────────────────────────────────
+  static const String leaveRequests = 'Query/EmployeeLeaveRequests';
+  static const String createLeaveRequest = 'Functions/CreateEmployeeLeaveRequest';
+  static const String leaveTypes = 'lookups/leaveTypes';
 }

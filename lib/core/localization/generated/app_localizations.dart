@@ -110,23 +110,17 @@ abstract class AppLocalizations {
   /// **'Login'**
   String get login;
 
-  /// No description provided for @employeeId.
+  /// No description provided for @username.
   ///
   /// In en, this message translates to:
-  /// **'Employee ID'**
-  String get employeeId;
+  /// **'Username'**
+  String get username;
 
   /// No description provided for @password.
   ///
   /// In en, this message translates to:
   /// **'Password'**
   String get password;
-
-  /// No description provided for @forgotPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Forgot Password?'**
-  String get forgotPassword;
 
   /// No description provided for @loginButton.
   ///
@@ -139,12 +133,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logout'**
   String get logout;
-
-  /// No description provided for @logoutConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to logout?'**
-  String get logoutConfirm;
 
   /// No description provided for @cancel.
   ///
@@ -164,203 +152,17 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get retry;
 
-  /// No description provided for @home.
+  /// No description provided for @welcomeBack.
   ///
   /// In en, this message translates to:
-  /// **'Home'**
-  String get home;
+  /// **'Welcome back'**
+  String get welcomeBack;
 
-  /// No description provided for @attendance.
+  /// No description provided for @signInSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Attendance'**
-  String get attendance;
-
-  /// No description provided for @leaves.
-  ///
-  /// In en, this message translates to:
-  /// **'Leaves'**
-  String get leaves;
-
-  /// No description provided for @shifts.
-  ///
-  /// In en, this message translates to:
-  /// **'Shifts'**
-  String get shifts;
-
-  /// No description provided for @profile.
-  ///
-  /// In en, this message translates to:
-  /// **'Profile'**
-  String get profile;
-
-  /// No description provided for @settings.
-  ///
-  /// In en, this message translates to:
-  /// **'Settings'**
-  String get settings;
-
-  /// No description provided for @notifications.
-  ///
-  /// In en, this message translates to:
-  /// **'Notifications'**
-  String get notifications;
-
-  /// No description provided for @checkIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Check In'**
-  String get checkIn;
-
-  /// No description provided for @checkOut.
-  ///
-  /// In en, this message translates to:
-  /// **'Check Out'**
-  String get checkOut;
-
-  /// No description provided for @checkedInAt.
-  ///
-  /// In en, this message translates to:
-  /// **'Checked in at {time}'**
-  String checkedInAt(String time);
-
-  /// No description provided for @workHoursToday.
-  ///
-  /// In en, this message translates to:
-  /// **'Work Hours Today'**
-  String get workHoursToday;
-
-  /// No description provided for @attendanceHistory.
-  ///
-  /// In en, this message translates to:
-  /// **'Attendance History'**
-  String get attendanceHistory;
-
-  /// No description provided for @attendanceStats.
-  ///
-  /// In en, this message translates to:
-  /// **'Statistics'**
-  String get attendanceStats;
-
-  /// No description provided for @leaveBalance.
-  ///
-  /// In en, this message translates to:
-  /// **'Leave Balance'**
-  String get leaveBalance;
-
-  /// No description provided for @newLeaveRequest.
-  ///
-  /// In en, this message translates to:
-  /// **'New Leave Request'**
-  String get newLeaveRequest;
-
-  /// No description provided for @leaveType.
-  ///
-  /// In en, this message translates to:
-  /// **'Leave Type'**
-  String get leaveType;
-
-  /// No description provided for @startDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Start Date'**
-  String get startDate;
-
-  /// No description provided for @endDate.
-  ///
-  /// In en, this message translates to:
-  /// **'End Date'**
-  String get endDate;
-
-  /// No description provided for @reason.
-  ///
-  /// In en, this message translates to:
-  /// **'Reason'**
-  String get reason;
-
-  /// No description provided for @attachment.
-  ///
-  /// In en, this message translates to:
-  /// **'Attachment'**
-  String get attachment;
-
-  /// No description provided for @submit.
-  ///
-  /// In en, this message translates to:
-  /// **'Submit'**
-  String get submit;
-
-  /// No description provided for @pending.
-  ///
-  /// In en, this message translates to:
-  /// **'Pending'**
-  String get pending;
-
-  /// No description provided for @approved.
-  ///
-  /// In en, this message translates to:
-  /// **'Approved'**
-  String get approved;
-
-  /// No description provided for @rejected.
-  ///
-  /// In en, this message translates to:
-  /// **'Rejected'**
-  String get rejected;
-
-  /// No description provided for @cancelled.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancelled'**
-  String get cancelled;
-
-  /// No description provided for @myShifts.
-  ///
-  /// In en, this message translates to:
-  /// **'My Shifts'**
-  String get myShifts;
-
-  /// No description provided for @shiftChangeRequest.
-  ///
-  /// In en, this message translates to:
-  /// **'Change Request'**
-  String get shiftChangeRequest;
-
-  /// No description provided for @currentShift.
-  ///
-  /// In en, this message translates to:
-  /// **'Current Shift'**
-  String get currentShift;
-
-  /// No description provided for @personalInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Personal Information'**
-  String get personalInfo;
-
-  /// No description provided for @jobInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Job Information'**
-  String get jobInfo;
-
-  /// No description provided for @language.
-  ///
-  /// In en, this message translates to:
-  /// **'Language'**
-  String get language;
-
-  /// No description provided for @theme.
-  ///
-  /// In en, this message translates to:
-  /// **'Theme'**
-  String get theme;
-
-  /// No description provided for @darkMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark Mode'**
-  String get darkMode;
+  /// **'Sign in to access the HR portal'**
+  String get signInSubtitle;
 
   /// No description provided for @noDataFound.
   ///
@@ -380,41 +182,215 @@ abstract class AppLocalizations {
   /// **'No internet connection'**
   String get noInternet;
 
-  /// No description provided for @welcomeBack.
+  /// No description provided for @employees.
   ///
   /// In en, this message translates to:
-  /// **'Welcome back'**
-  String get welcomeBack;
+  /// **'Employees'**
+  String get employees;
 
-  /// No description provided for @todaySummary.
+  /// No description provided for @employeesList.
   ///
   /// In en, this message translates to:
-  /// **'Today\'s Summary'**
-  String get todaySummary;
+  /// **'Employees List'**
+  String get employeesList;
 
-  /// No description provided for @annualLeave.
+  /// No description provided for @employeeDetails.
   ///
   /// In en, this message translates to:
-  /// **'Annual Leave'**
-  String get annualLeave;
+  /// **'Employee Details'**
+  String get employeeDetails;
 
-  /// No description provided for @sickLeave.
+  /// No description provided for @employeeCode.
   ///
   /// In en, this message translates to:
-  /// **'Sick Leave'**
-  String get sickLeave;
+  /// **'Employee Code'**
+  String get employeeCode;
 
-  /// No description provided for @casualLeave.
+  /// No description provided for @searchByCode.
   ///
   /// In en, this message translates to:
-  /// **'Casual Leave'**
-  String get casualLeave;
+  /// **'Search by employee code...'**
+  String get searchByCode;
 
-  /// No description provided for @daysRemaining.
+  /// No description provided for @search.
   ///
   /// In en, this message translates to:
-  /// **'{count} days remaining'**
-  String daysRemaining(int count);
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @employeeName.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee Name'**
+  String get employeeName;
+
+  /// No description provided for @jobTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Job Title'**
+  String get jobTitle;
+
+  /// No description provided for @department.
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get department;
+
+  /// No description provided for @hireDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Hire Date'**
+  String get hireDate;
+
+  /// No description provided for @personalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Information'**
+  String get personalInfo;
+
+  /// No description provided for @jobInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Job Information'**
+  String get jobInfo;
+
+  /// No description provided for @shiftInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift Information'**
+  String get shiftInfo;
+
+  /// No description provided for @shiftType.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift Type'**
+  String get shiftType;
+
+  /// No description provided for @shiftName.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift Name'**
+  String get shiftName;
+
+  /// No description provided for @groupName.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get groupName;
+
+  /// No description provided for @employeeStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee Status'**
+  String get employeeStatus;
+
+  /// No description provided for @employmentStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Employment Status'**
+  String get employmentStatus;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// No description provided for @retired.
+  ///
+  /// In en, this message translates to:
+  /// **'Retired'**
+  String get retired;
+
+  /// No description provided for @deceased.
+  ///
+  /// In en, this message translates to:
+  /// **'Deceased'**
+  String get deceased;
+
+  /// No description provided for @terminationDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Termination Date'**
+  String get terminationDate;
+
+  /// No description provided for @jobGrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Job Grade'**
+  String get jobGrade;
+
+  /// No description provided for @jobGradeDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Grade Date'**
+  String get jobGradeDate;
+
+  /// No description provided for @totalEmployees.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Employees'**
+  String get totalEmployees;
+
+  /// No description provided for @pageOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {current} of {total}'**
+  String pageOf(int current, int total);
+
+  /// No description provided for @loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get loadMore;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed'**
+  String get loginFailed;
+
+  /// No description provided for @loginSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Login successful'**
+  String get loginSuccess;
+
+  /// No description provided for @invalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid credentials'**
+  String get invalidCredentials;
+
+  /// No description provided for @code.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get code;
+
+  /// No description provided for @decisionNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Decision Number'**
+  String get decisionNumber;
+
+  /// No description provided for @fixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed'**
+  String get fixed;
+
+  /// No description provided for @rotating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotating'**
+  String get rotating;
 }
 
 class _AppLocalizationsDelegate

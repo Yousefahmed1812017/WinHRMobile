@@ -5,10 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 /// Win HR application themes (Light & Dark).
+/// Clean white + navy blue professional design.
 class AppTheme {
   AppTheme._();
 
-  // ── Shared Values ──────────────────────────────────────────────────────
   static const double _borderRadius = 12.0;
   static const double _inputRadius = 10.0;
 
@@ -22,9 +22,9 @@ class AppTheme {
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: const ColorScheme.light(
-        primary: AppColors.primary,
+        primary: AppColors.accent,
         onPrimary: AppColors.textOnPrimary,
-        secondary: AppColors.secondary,
+        secondary: AppColors.primary,
         surface: AppColors.surface,
         error: AppColors.danger,
       ),
@@ -39,10 +39,15 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         titleTextStyle: GoogleFonts.cairo(
           fontSize: 18,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: AppColors.textPrimary,
         ),
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
       ),
 
       // ── Cards ───────────────────────────────────────────────────────
@@ -52,14 +57,14 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_borderRadius),
-          side: const BorderSide(color: AppColors.border, width: 1),
+          side: const BorderSide(color: AppColors.border, width: 0.5),
         ),
       ),
 
       // ── Elevated Button ─────────────────────────────────────────────
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.accent,
           foregroundColor: AppColors.textOnPrimary,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -76,12 +81,12 @@ class AppTheme {
       // ── Outlined Button ─────────────────────────────────────────────
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.accent,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_borderRadius),
           ),
-          side: const BorderSide(color: AppColors.primary),
+          side: const BorderSide(color: AppColors.accent),
           textStyle: GoogleFonts.cairo(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -92,7 +97,7 @@ class AppTheme {
       // ── Text Button ─────────────────────────────────────────────────
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.accent,
           textStyle: GoogleFonts.cairo(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -116,7 +121,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_inputRadius),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_inputRadius),
@@ -144,7 +149,7 @@ class AppTheme {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         type: BottomNavigationBarType.fixed,
         backgroundColor: AppColors.surface,
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: AppColors.accent,
         unselectedItemColor: AppColors.textTertiary,
         selectedLabelStyle: GoogleFonts.cairo(
           fontSize: 12,
@@ -156,7 +161,7 @@ class AppTheme {
 
       // ── Floating Action Button ──────────────────────────────────────
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.accent,
         foregroundColor: AppColors.textOnPrimary,
         elevation: 4,
         shape: CircleBorder(),
@@ -165,7 +170,7 @@ class AppTheme {
       // ── Chip ────────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariant,
-        selectedColor: AppColors.primarySurface,
+        selectedColor: AppColors.accentSurface,
         labelStyle: GoogleFonts.cairo(fontSize: 13),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
@@ -213,26 +218,26 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      primaryColor: AppColors.primaryLight,
+      primaryColor: AppColors.accentLight,
       scaffoldBackgroundColor: AppColors.darkBackground,
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.primaryLight,
+        primary: AppColors.accentLight,
         onPrimary: AppColors.white,
-        secondary: AppColors.secondary,
+        secondary: AppColors.accent,
         surface: AppColors.darkSurface,
         error: AppColors.danger,
       ),
 
       appBarTheme: AppBarTheme(
         elevation: 0,
-        scrolledUnderElevation: 0.5,
+        scrolledUnderElevation: 0,
         centerTitle: true,
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.darkTextPrimary,
         surfaceTintColor: Colors.transparent,
         titleTextStyle: GoogleFonts.cairo(
           fontSize: 18,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: AppColors.darkTextPrimary,
         ),
         systemOverlayStyle: SystemUiOverlayStyle.light,
@@ -250,7 +255,7 @@ class AppTheme {
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
+          backgroundColor: AppColors.accent,
           foregroundColor: AppColors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -280,11 +285,7 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_inputRadius),
           borderSide:
-              const BorderSide(color: AppColors.primaryLight, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(_inputRadius),
-          borderSide: const BorderSide(color: AppColors.danger, width: 1),
+              const BorderSide(color: AppColors.accentLight, width: 1.5),
         ),
         hintStyle: GoogleFonts.cairo(
           color: AppColors.darkTextSecondary,
@@ -294,19 +295,6 @@ class AppTheme {
           color: AppColors.darkTextSecondary,
           fontSize: 14,
         ),
-      ),
-
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: AppColors.darkSurface,
-        selectedItemColor: AppColors.primaryLight,
-        unselectedItemColor: AppColors.darkTextSecondary,
-        selectedLabelStyle: GoogleFonts.cairo(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: GoogleFonts.cairo(fontSize: 12),
-        elevation: 8,
       ),
 
       dividerTheme: const DividerThemeData(

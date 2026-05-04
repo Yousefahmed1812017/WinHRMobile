@@ -6,6 +6,13 @@ class StorageKeys {
   static const String accessToken = 'access_token';
   static const String refreshToken = 'refresh_token';
   static const String userId = 'user_id';
+  static const String username = 'username';
+  static const String userFullName = 'user_full_name';
+  static const String userEmail = 'user_email';
+  static const String userImageUrl = 'user_image_url';
+  static const String userRoleName = 'user_role_name';
+  static const String userEmployeeId = 'user_employee_id';
+  static const String userEmployeeCode = 'user_employee_code';
 
   // ── Hive Boxes ─────────────────────────────────────────────────────────
   static const String settingsBox = 'settings_box';

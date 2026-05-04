@@ -15,22 +15,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login => 'Login';
 
   @override
-  String get employeeId => 'Employee ID';
+  String get username => 'Username';
 
   @override
   String get password => 'Password';
-
-  @override
-  String get forgotPassword => 'Forgot Password?';
 
   @override
   String get loginButton => 'Sign In';
 
   @override
   String get logout => 'Logout';
-
-  @override
-  String get logoutConfirm => 'Are you sure you want to logout?';
 
   @override
   String get cancel => 'Cancel';
@@ -42,105 +36,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retry => 'Retry';
 
   @override
-  String get home => 'Home';
+  String get welcomeBack => 'Welcome back';
 
   @override
-  String get attendance => 'Attendance';
-
-  @override
-  String get leaves => 'Leaves';
-
-  @override
-  String get shifts => 'Shifts';
-
-  @override
-  String get profile => 'Profile';
-
-  @override
-  String get settings => 'Settings';
-
-  @override
-  String get notifications => 'Notifications';
-
-  @override
-  String get checkIn => 'Check In';
-
-  @override
-  String get checkOut => 'Check Out';
-
-  @override
-  String checkedInAt(String time) {
-    return 'Checked in at $time';
-  }
-
-  @override
-  String get workHoursToday => 'Work Hours Today';
-
-  @override
-  String get attendanceHistory => 'Attendance History';
-
-  @override
-  String get attendanceStats => 'Statistics';
-
-  @override
-  String get leaveBalance => 'Leave Balance';
-
-  @override
-  String get newLeaveRequest => 'New Leave Request';
-
-  @override
-  String get leaveType => 'Leave Type';
-
-  @override
-  String get startDate => 'Start Date';
-
-  @override
-  String get endDate => 'End Date';
-
-  @override
-  String get reason => 'Reason';
-
-  @override
-  String get attachment => 'Attachment';
-
-  @override
-  String get submit => 'Submit';
-
-  @override
-  String get pending => 'Pending';
-
-  @override
-  String get approved => 'Approved';
-
-  @override
-  String get rejected => 'Rejected';
-
-  @override
-  String get cancelled => 'Cancelled';
-
-  @override
-  String get myShifts => 'My Shifts';
-
-  @override
-  String get shiftChangeRequest => 'Change Request';
-
-  @override
-  String get currentShift => 'Current Shift';
-
-  @override
-  String get personalInfo => 'Personal Information';
-
-  @override
-  String get jobInfo => 'Job Information';
-
-  @override
-  String get language => 'Language';
-
-  @override
-  String get theme => 'Theme';
-
-  @override
-  String get darkMode => 'Dark Mode';
+  String get signInSubtitle => 'Sign in to access the HR portal';
 
   @override
   String get noDataFound => 'No data found';
@@ -152,22 +51,109 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noInternet => 'No internet connection';
 
   @override
-  String get welcomeBack => 'Welcome back';
+  String get employees => 'Employees';
 
   @override
-  String get todaySummary => 'Today\'s Summary';
+  String get employeesList => 'Employees List';
 
   @override
-  String get annualLeave => 'Annual Leave';
+  String get employeeDetails => 'Employee Details';
 
   @override
-  String get sickLeave => 'Sick Leave';
+  String get employeeCode => 'Employee Code';
 
   @override
-  String get casualLeave => 'Casual Leave';
+  String get searchByCode => 'Search by employee code...';
 
   @override
-  String daysRemaining(int count) {
-    return '$count days remaining';
+  String get search => 'Search';
+
+  @override
+  String get employeeName => 'Employee Name';
+
+  @override
+  String get jobTitle => 'Job Title';
+
+  @override
+  String get department => 'Department';
+
+  @override
+  String get hireDate => 'Hire Date';
+
+  @override
+  String get personalInfo => 'Personal Information';
+
+  @override
+  String get jobInfo => 'Job Information';
+
+  @override
+  String get shiftInfo => 'Shift Information';
+
+  @override
+  String get shiftType => 'Shift Type';
+
+  @override
+  String get shiftName => 'Shift Name';
+
+  @override
+  String get groupName => 'Group';
+
+  @override
+  String get employeeStatus => 'Employee Status';
+
+  @override
+  String get employmentStatus => 'Employment Status';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get retired => 'Retired';
+
+  @override
+  String get deceased => 'Deceased';
+
+  @override
+  String get terminationDate => 'Termination Date';
+
+  @override
+  String get jobGrade => 'Job Grade';
+
+  @override
+  String get jobGradeDate => 'Grade Date';
+
+  @override
+  String get totalEmployees => 'Total Employees';
+
+  @override
+  String pageOf(int current, int total) {
+    return 'Page $current of $total';
   }
+
+  @override
+  String get loadMore => 'Load More';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get loginFailed => 'Login failed';
+
+  @override
+  String get loginSuccess => 'Login successful';
+
+  @override
+  String get invalidCredentials => 'Invalid credentials';
+
+  @override
+  String get code => 'Code';
+
+  @override
+  String get decisionNumber => 'Decision Number';
+
+  @override
+  String get fixed => 'Fixed';
+
+  @override
+  String get rotating => 'Rotating';
 }

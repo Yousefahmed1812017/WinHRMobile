@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:win_hr/core/localization/generated/app_localizations.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/routing/route_names.dart';
-import '../../../../core/utils/validators.dart';
-import '../../../../core/widgets/custom_button.dart';
-import '../../../../core/widgets/custom_text_field.dart';
+import '../../data/auth_provider.dart';
 
-/// Login screen — employee ID + password.
+/// Login screen — clean white design with subtle accent touches.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -21,35 +18,36 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _employeeIdController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false;
   bool _obscurePassword = true;
 
   late AnimationController _animController;
-  late Animation<Offset> _slideAnim;
   late Animation<double> _fadeAnim;
+  late Animation<Offset> _slideAnim;
 
   @override
   void initState() {
     super.initState();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 900),
     );
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
     _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOut),
     );
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(
+        CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic));
+
     _animController.forward();
   }
 
   @override
   void dispose() {
-    _employeeIdController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     _animController.dispose();
     super.dispose();
@@ -58,175 +56,357 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
-
-    // TODO: Call AuthRepository.login()
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-
-    // Navigate to home on success
-    context.go(RouteNames.home);
+    await ref.read(authStateProvider.notifier).login(
+          _usernameController.text.trim(),
+          _passwordController.text,
+        );
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final authState = ref.watch(authStateProvider);
+
+    // Listen for auth state changes
+    ref.listen<AuthState>(authStateProvider, (prev, next) {
+      if (next.status == AuthStatus.authenticated) {
+        context.go(RouteNames.employees);
+      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    next.errorMessage!,
+                    style: GoogleFonts.cairo(fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.danger,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+      }
+    });
+
+    final isLoading = authState.status == AuthStatus.loading;
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                // ── Header ──────────────────────────────────────────────
-                const SizedBox(height: 48),
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: AppColors.white.withOpacity(0.3),
-                    ),
-                  ),
-                  child: const Icon(
-                    Icons.business_rounded,
-                    size: 40,
-                    color: AppColors.white,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Win HR',
-                  style: GoogleFonts.inter(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.white,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.login,
-                  style: GoogleFonts.cairo(
-                    fontSize: 16,
-                    color: AppColors.white.withOpacity(0.8),
-                  ),
-                ),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom,
+            ),
+            child: FadeTransition(
+              opacity: _fadeAnim,
+              child: SlideTransition(
+                position: _slideAnim,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 40),
 
-                const SizedBox(height: 40),
-
-                // ── Form Card ───────────────────────────────────────────
-                FadeTransition(
-                  opacity: _fadeAnim,
-                  child: SlideTransition(
-                    position: _slideAnim,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 24),
-                      padding: const EdgeInsets.all(28),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.black.withOpacity(0.1),
-                            blurRadius: 30,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              l10n.welcomeBack,
-                              style: GoogleFonts.cairo(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                              textAlign: TextAlign.center,
+                      // ── Logo ──────────────────────────────────────
+                      Container(
+                        width: 110,
+                        height: 110,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.accent.withValues(alpha: 0.12),
+                              blurRadius: 30,
+                              spreadRadius: 5,
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Sign in to access your HR portal',
-                              style: GoogleFonts.cairo(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 32),
-
-                            // Employee ID
-                            CustomTextField(
-                              label: l10n.employeeId,
-                              hint: '1234',
-                              controller: _employeeIdController,
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
-                              prefixIcon: const Icon(Icons.badge_outlined),
-                              validator: Validators.employeeId,
-                            ),
-                            const SizedBox(height: 20),
-
-                            // Password
-                            CustomTextField(
-                              label: l10n.password,
-                              hint: '••••••',
-                              controller: _passwordController,
-                              obscureText: _obscurePassword,
-                              textInputAction: TextInputAction.done,
-                              prefixIcon: const Icon(Icons.lock_outline_rounded),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  color: AppColors.textTertiary,
-                                ),
-                                onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword,
-                                ),
-                              ),
-                              validator: Validators.password,
-                            ),
-
-                            // Forgot password
-                            Align(
-                              alignment: AlignmentDirectional.centerEnd,
-                              child: TextButton(
-                                onPressed: () {
-                                  // TODO: Navigate to forgot password
-                                },
-                                child: Text(l10n.forgotPassword),
-                              ),
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            // Login button
-                            CustomButton(
-                              label: l10n.loginButton,
-                              isLoading: _isLoading,
-                              onPressed: _handleLogin,
-                              icon: Icons.login_rounded,
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.06),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
+                        child: ClipOval(
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Image.asset(
+                              'assets/images/company_logo.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+
+                      const SizedBox(height: 20),
+
+                      // ── App name ──────────────────────────────────
+                      Text(
+                        'Win HR',
+                        style: GoogleFonts.inter(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'بوابة الموارد البشرية',
+                        style: GoogleFonts.cairo(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+
+                      const SizedBox(height: 40),
+
+                      // ── Form Card ─────────────────────────────────
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.06),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // Title
+                              Text(
+                                'تسجيل الدخول',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.textPrimary,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'أدخل بياناتك للوصول إلى حسابك',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 13,
+                                  color: AppColors.textTertiary,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 28),
+
+                              // Username field
+                              Text(
+                                'اسم المستخدم',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                controller: _usernameController,
+                                textInputAction: TextInputAction.next,
+                                style: GoogleFonts.cairo(fontSize: 15),
+                                decoration: InputDecoration(
+                                  hintText: 'أدخل اسم المستخدم',
+                                  prefixIcon: Icon(
+                                    Icons.person_outline_rounded,
+                                    color: AppColors.textTertiary
+                                        .withValues(alpha: 0.7),
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.surfaceVariant,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.border,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.accent,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.danger,
+                                      width: 1,
+                                    ),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'اسم المستخدم مطلوب';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 18),
+
+                              // Password field
+                              Text(
+                                'كلمة المرور',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: _obscurePassword,
+                                textInputAction: TextInputAction.done,
+                                style: GoogleFonts.cairo(fontSize: 15),
+                                onFieldSubmitted: (_) => _handleLogin(),
+                                decoration: InputDecoration(
+                                  hintText: '••••••',
+                                  prefixIcon: Icon(
+                                    Icons.lock_outline_rounded,
+                                    color: AppColors.textTertiary
+                                        .withValues(alpha: 0.7),
+                                  ),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                      color: AppColors.textTertiary,
+                                      size: 20,
+                                    ),
+                                    onPressed: () => setState(() =>
+                                        _obscurePassword = !_obscurePassword),
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.surfaceVariant,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.border,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.accent,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.danger,
+                                      width: 1,
+                                    ),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'كلمة المرور مطلوبة';
+                                  }
+                                  return null;
+                                },
+                              ),
+
+                              const SizedBox(height: 28),
+
+                              // Login button
+                              SizedBox(
+                                height: 52,
+                                child: ElevatedButton(
+                                  onPressed: isLoading ? null : _handleLogin,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Colors.white,
+                                    disabledBackgroundColor:
+                                        AppColors.primary
+                                            .withValues(alpha: 0.6),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          height: 22,
+                                          width: 22,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            color: AppColors.white,
+                                          ),
+                                        )
+                                      : Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(Icons.login_rounded,
+                                                size: 20),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'تسجيل الدخول',
+                                              style: GoogleFonts.cairo(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      // ── Footer ────────────────────────────────────
+                      Text(
+                        'الدلتا للأسمدة والصناعات الكيماوية',
+                        style: GoogleFonts.cairo(
+                          fontSize: 12,
+                          color: AppColors.textTertiary,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 32),
-              ],
+              ),
             ),
           ),
         ),

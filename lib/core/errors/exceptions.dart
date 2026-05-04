@@ -1,7 +1,7 @@
-/// Data-layer exceptions thrown by datasources.
-///
-/// These are caught by repositories and converted to [Failure] objects.
+// Data-layer exceptions thrown by datasources.
+// These are caught by repositories and converted to Failure objects.
 
+/// Exception thrown when a server-side error occurs.
 class ServerException implements Exception {
   final String message;
   const ServerException([this.message = 'Server error.']);

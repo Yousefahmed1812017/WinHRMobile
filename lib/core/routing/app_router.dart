@@ -3,15 +3,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/attendance/presentation/screens/attendance_home_screen.dart';
-import '../../features/attendance/presentation/screens/attendance_history_screen.dart';
-import '../../features/leaves/presentation/screens/leaves_list_screen.dart';
-import '../../features/leaves/presentation/screens/new_leave_request_screen.dart';
-import '../../features/leaves/presentation/screens/leave_balance_screen.dart';
-import '../../features/shifts/presentation/screens/shifts_screen.dart';
-import '../../features/profile/presentation/screens/profile_screen.dart';
-import '../../features/home/presentation/screens/main_shell.dart';
+import '../../features/auth/presentation/screens/profile_screen.dart';
+import '../../features/employees/presentation/screens/employees_list_screen.dart';
+import '../../features/employees/presentation/screens/employee_details_screen.dart';
+import '../../features/employees/data/models/employee_model.dart';
+import '../../features/leaves/presentation/screens/leave_requests_screen.dart';
+import '../../features/leaves/presentation/screens/create_leave_request_screen.dart';
+import '../../shared/widgets/main_shell.dart';
 import 'route_names.dart';
 
 /// Application router configuration using [go_router].
@@ -26,7 +24,7 @@ class AppRouter {
     initialLocation: RouteNames.splash,
     debugLogDiagnostics: true,
     routes: [
-      // ── Auth Routes ───────────────────────────────────────────────────
+      // ── Auth Routes (outside shell) ────────────────────────────────
       GoRoute(
         path: RouteNames.splash,
         builder: (context, state) => const SplashScreen(),
@@ -36,61 +34,40 @@ class AppRouter {
         builder: (context, state) => const LoginScreen(),
       ),
 
-      // ── Main App Shell (Bottom Navigation) ────────────────────────────
+      // ── Main Shell (with bottom nav) ───────────────────────────────
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) => MainShell(child: child),
         routes: [
           GoRoute(
-            path: RouteNames.home,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HomeScreen(),
-            ),
+            path: RouteNames.employees,
+            builder: (context, state) => const EmployeesListScreen(),
           ),
           GoRoute(
-            path: RouteNames.attendance,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: AttendanceHomeScreen(),
-            ),
-            routes: [
-              GoRoute(
-                path: 'history',
-                builder: (context, state) =>
-                    const AttendanceHistoryScreen(),
-              ),
-            ],
-          ),
-          GoRoute(
-            path: RouteNames.leaves,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: LeavesListScreen(),
-            ),
-            routes: [
-              GoRoute(
-                path: 'new',
-                builder: (context, state) =>
-                    const NewLeaveRequestScreen(),
-              ),
-              GoRoute(
-                path: 'balance',
-                builder: (context, state) =>
-                    const LeaveBalanceScreen(),
-              ),
-            ],
-          ),
-          GoRoute(
-            path: RouteNames.shifts,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: ShiftsScreen(),
-            ),
+            path: RouteNames.leaveRequests,
+            builder: (context, state) => const LeaveRequestsScreen(),
           ),
           GoRoute(
             path: RouteNames.profile,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: ProfileScreen(),
-            ),
+            builder: (context, state) => const ProfileScreen(),
           ),
         ],
+      ),
+
+      // ── Detail Routes (full-screen, outside shell) ─────────────────
+      GoRoute(
+        path: RouteNames.employeeDetails,
+        builder: (context, state) {
+          final employee = state.extra as Employee;
+          return EmployeeDetailsScreen(employee: employee);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.createLeaveRequest,
+        builder: (context, state) {
+          final employee = state.extra as Employee?;
+          return CreateLeaveRequestScreen(prefilledEmployee: employee);
+        },
       ),
     ],
 

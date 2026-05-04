@@ -15,22 +15,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get login => 'تسجيل الدخول';
 
   @override
-  String get employeeId => 'رقم الموظف';
+  String get username => 'اسم المستخدم';
 
   @override
   String get password => 'كلمة المرور';
-
-  @override
-  String get forgotPassword => 'نسيت كلمة المرور؟';
 
   @override
   String get loginButton => 'دخول';
 
   @override
   String get logout => 'تسجيل الخروج';
-
-  @override
-  String get logoutConfirm => 'هل أنت متأكد من تسجيل الخروج؟';
 
   @override
   String get cancel => 'إلغاء';
@@ -42,105 +36,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get retry => 'إعادة المحاولة';
 
   @override
-  String get home => 'الرئيسية';
+  String get welcomeBack => 'مرحباً بعودتك';
 
   @override
-  String get attendance => 'الحضور';
-
-  @override
-  String get leaves => 'الإجازات';
-
-  @override
-  String get shifts => 'الورديات';
-
-  @override
-  String get profile => 'الملف الشخصي';
-
-  @override
-  String get settings => 'الإعدادات';
-
-  @override
-  String get notifications => 'الإشعارات';
-
-  @override
-  String get checkIn => 'تسجيل حضور';
-
-  @override
-  String get checkOut => 'تسجيل انصراف';
-
-  @override
-  String checkedInAt(String time) {
-    return 'تم التسجيل في $time';
-  }
-
-  @override
-  String get workHoursToday => 'ساعات العمل اليوم';
-
-  @override
-  String get attendanceHistory => 'سجل الحضور';
-
-  @override
-  String get attendanceStats => 'الإحصائيات';
-
-  @override
-  String get leaveBalance => 'رصيد الإجازات';
-
-  @override
-  String get newLeaveRequest => 'طلب إجازة جديد';
-
-  @override
-  String get leaveType => 'نوع الإجازة';
-
-  @override
-  String get startDate => 'تاريخ البداية';
-
-  @override
-  String get endDate => 'تاريخ النهاية';
-
-  @override
-  String get reason => 'السبب';
-
-  @override
-  String get attachment => 'مرفق';
-
-  @override
-  String get submit => 'إرسال';
-
-  @override
-  String get pending => 'قيد المراجعة';
-
-  @override
-  String get approved => 'مقبول';
-
-  @override
-  String get rejected => 'مرفوض';
-
-  @override
-  String get cancelled => 'ملغي';
-
-  @override
-  String get myShifts => 'ورديات العمل';
-
-  @override
-  String get shiftChangeRequest => 'طلب تعديل وردية';
-
-  @override
-  String get currentShift => 'الوردية الحالية';
-
-  @override
-  String get personalInfo => 'البيانات الشخصية';
-
-  @override
-  String get jobInfo => 'البيانات الوظيفية';
-
-  @override
-  String get language => 'اللغة';
-
-  @override
-  String get theme => 'المظهر';
-
-  @override
-  String get darkMode => 'الوضع الليلي';
+  String get signInSubtitle => 'سجل دخولك للوصول إلى بوابة الموارد البشرية';
 
   @override
   String get noDataFound => 'لا توجد بيانات';
@@ -152,22 +51,109 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noInternet => 'لا يوجد اتصال بالإنترنت';
 
   @override
-  String get welcomeBack => 'مرحباً بعودتك';
+  String get employees => 'الموظفين';
 
   @override
-  String get todaySummary => 'ملخص اليوم';
+  String get employeesList => 'قائمة الموظفين';
 
   @override
-  String get annualLeave => 'إجازة سنوية';
+  String get employeeDetails => 'تفاصيل الموظف';
 
   @override
-  String get sickLeave => 'إجازة مرضية';
+  String get employeeCode => 'كود الموظف';
 
   @override
-  String get casualLeave => 'إجازة عارضة';
+  String get searchByCode => 'بحث بكود الموظف...';
 
   @override
-  String daysRemaining(int count) {
-    return '$count يوم متبقي';
+  String get search => 'بحث';
+
+  @override
+  String get employeeName => 'اسم الموظف';
+
+  @override
+  String get jobTitle => 'المسمى الوظيفي';
+
+  @override
+  String get department => 'الإدارة';
+
+  @override
+  String get hireDate => 'تاريخ التعيين';
+
+  @override
+  String get personalInfo => 'البيانات الشخصية';
+
+  @override
+  String get jobInfo => 'البيانات الوظيفية';
+
+  @override
+  String get shiftInfo => 'بيانات الوردية';
+
+  @override
+  String get shiftType => 'نوع الوردية';
+
+  @override
+  String get shiftName => 'اسم الوردية';
+
+  @override
+  String get groupName => 'المجموعة';
+
+  @override
+  String get employeeStatus => 'حالة الموظف';
+
+  @override
+  String get employmentStatus => 'الحالة الوظيفية';
+
+  @override
+  String get active => 'يعمل';
+
+  @override
+  String get retired => 'متقاعد';
+
+  @override
+  String get deceased => 'وفاة';
+
+  @override
+  String get terminationDate => 'تاريخ إنهاء الخدمة';
+
+  @override
+  String get jobGrade => 'الدرجة الوظيفية';
+
+  @override
+  String get jobGradeDate => 'تاريخ الدرجة';
+
+  @override
+  String get totalEmployees => 'إجمالي الموظفين';
+
+  @override
+  String pageOf(int current, int total) {
+    return 'صفحة $current من $total';
   }
+
+  @override
+  String get loadMore => 'تحميل المزيد';
+
+  @override
+  String get loading => 'جاري التحميل...';
+
+  @override
+  String get loginFailed => 'فشل تسجيل الدخول';
+
+  @override
+  String get loginSuccess => 'تم تسجيل الدخول بنجاح';
+
+  @override
+  String get invalidCredentials => 'بيانات الدخول غير صحيحة';
+
+  @override
+  String get code => 'الكود';
+
+  @override
+  String get decisionNumber => 'رقم القرار';
+
+  @override
+  String get fixed => 'ثابت';
+
+  @override
+  String get rotating => 'المناوبة';
 }
