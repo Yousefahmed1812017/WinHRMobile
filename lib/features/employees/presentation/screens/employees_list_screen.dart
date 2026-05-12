@@ -270,15 +270,7 @@ class _ActionSheet extends StatelessWidget {
 
   void _navigate(BuildContext context, _Action action) {
     if (action.isAbsence) {
-      // TODO: navigate to absence registration screen
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('تسجيل الغياب — قريباً',
-              style: GoogleFonts.cairo()),
-          backgroundColor: AppColors.primary,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      context.push(RouteNames.createAbsence, extra: employee);
       return;
     }
 

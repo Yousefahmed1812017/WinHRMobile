@@ -12,5 +12,6 @@ class RouteNames {
   static const String employeeDetails = '/employees/details';
   static const String leaveRequests = '/leave-requests';
   static const String createLeaveRequest = '/leave-requests/create';
+  static const String createAbsence = '/employees/absence';
   static const String profile = '/profile';
 }

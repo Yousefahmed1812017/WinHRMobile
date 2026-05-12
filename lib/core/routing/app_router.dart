@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/employees/presentation/screens/create_absence_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/employees/presentation/screens/employees_list_screen.dart';
@@ -65,6 +66,13 @@ class AppRouter {
         builder: (context, state) {
           final employee = state.extra as Employee;
           return EmployeeDetailsScreen(employee: employee);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.createAbsence,
+        builder: (context, state) {
+          final employee = state.extra as Employee;
+          return CreateAbsenceScreen(employee: employee);
         },
       ),
       GoRoute(

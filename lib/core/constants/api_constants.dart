@@ -22,4 +22,5 @@ class ApiConstants {
   static const String leaveRequests = 'Query/EmployeeLeaveRequests';
   static const String createLeaveRequest = 'Functions/CreateEmployeeLeaveRequest';
   static const String leaveTypes = 'lookups/leaveTypes';
+  static const String createAbsence = 'Functions/CreateAbsence';
 }
