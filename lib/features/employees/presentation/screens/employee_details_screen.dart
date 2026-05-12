@@ -409,7 +409,7 @@ class _EmployeeDetailsScreenState
           )
         else
           ...leaveState.requests.map(
-            (req) => LeaveRequestCard(request: req),
+            (req) => LeaveCard(request: req),
           ),
       ],
     );

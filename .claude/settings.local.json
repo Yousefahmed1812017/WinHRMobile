@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(adb shell pm clear com.example.win_hr 2>&1)",
+      "PowerShell(adb shell \"pm list packages -3\" 2>&1)",
+      "PowerShell(adb shell pm list packages -3)",
+      "PowerShell(adb shell pm trim-caches 999999999 2>&1)",
+      "PowerShell(flutter analyze lib/features/employees lib/core/routing/app_router.dart)"
+    ]
+  }
+}

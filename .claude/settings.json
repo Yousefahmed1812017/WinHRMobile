@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(flutter analyze lib/features/onboarding lib/features/auth/presentation/screens/splash_screen.dart lib/core/routing/)",
+      "PowerShell(adb shell df /data 2>&1)"
+    ]
+  }
+}

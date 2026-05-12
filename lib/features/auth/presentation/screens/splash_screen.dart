@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/routing/route_names.dart';
 import '../../../../core/constants/storage_keys.dart';
@@ -104,7 +105,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) return;
 
-    // Check if token exists
+    final prefs = await SharedPreferences.getInstance();
+    final seenOnboarding = prefs.containsKey(StorageKeys.isFirstLaunch) &&
+        prefs.getBool(StorageKeys.isFirstLaunch) == false;
+
+    if (!mounted) return;
+
+    if (!seenOnboarding) {
+      context.go(RouteNames.onboarding);
+      return;
+    }
+
     const storage = FlutterSecureStorage();
     final token = await storage.read(key: StorageKeys.accessToken);
 
@@ -255,7 +266,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Win HR',
+                      'Lock Sys HR',
                       style: GoogleFonts.inter(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,

@@ -154,9 +154,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
                       // ── App name ──────────────────────────────────
                       Text(
-                        'Win HR',
+                        'Lock Sys HR',
                         style: GoogleFonts.inter(
-                          fontSize: 28,
+                          fontSize: 24,
                           fontWeight: FontWeight.w800,
                           color: AppColors.primary,
                           letterSpacing: 1,

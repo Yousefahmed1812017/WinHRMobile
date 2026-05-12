@@ -2,7 +2,7 @@
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'Win HR';
+  static const String appName = 'Lock Sys HR';
   static const String appVersion = '0.1.0';
 
   // ── Pagination ─────────────────────────────────────────────────────────

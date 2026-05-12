@@ -16,6 +16,7 @@ class ApiConstants {
 
   // ── Employees ──────────────────────────────────────────────────────────
   static const String employees = 'Query/EmployeeList';
+  static const String subordinates = 'Query/ActiveSubordinates';
 
   // ── Leave Requests ─────────────────────────────────────────────────────
   static const String leaveRequests = 'Query/EmployeeLeaveRequests';

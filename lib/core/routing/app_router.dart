@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/employees/presentation/screens/employees_list_screen.dart';
 import '../../features/employees/presentation/screens/employee_details_screen.dart';
@@ -28,6 +29,10 @@ class AppRouter {
       GoRoute(
         path: RouteNames.splash,
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
         path: RouteNames.login,
@@ -65,8 +70,14 @@ class AppRouter {
       GoRoute(
         path: RouteNames.createLeaveRequest,
         builder: (context, state) {
-          final employee = state.extra as Employee?;
-          return CreateLeaveRequestScreen(prefilledEmployee: employee);
+          final extra = state.extra;
+          if (extra is Map<String, dynamic>) {
+            return CreateLeaveRequestScreen(
+              prefilledEmployee: extra['employee'] as Employee?,
+              prefilledLeaveTypeId: extra['leaveTypeId'] as int?,
+            );
+          }
+          return CreateLeaveRequestScreen(prefilledEmployee: extra as Employee?);
         },
       ),
     ],

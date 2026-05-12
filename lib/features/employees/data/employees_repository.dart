@@ -35,6 +35,33 @@ class EmployeesRepository {
     }
   }
 
+  /// Fetches subordinates for a given manager (0-based page index).
+  Future<EmployeesResponse> getSubordinates({
+    required int managerId,
+    int pageNumber = 0,
+    int pageSize = 50,
+    String? employeeCode,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.subordinates,
+        data: {
+          'managerId': managerId,
+          'employeeId': null,
+          'employeeCode': employeeCode != null
+              ? (int.tryParse(employeeCode) ?? employeeCode)
+              : null,
+          'pageNumber': pageNumber,
+          'pageSize': pageSize,
+        },
+      );
+      return EmployeesResponse.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      debugPrint('[EmployeesRepository] getSubordinates error: ${e.message}');
+      rethrow;
+    }
+  }
+
   /// Searches for an employee by their code.
   /// Only sends the employeeCode — no pagination params.
   Future<EmployeesResponse> searchByCode(String code) async {

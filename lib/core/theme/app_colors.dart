@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // ── Primary (Navy / Dark Blue) ──────────────────────────────────────────
-  static const Color primary = Color(0xFF1A2744);
-  static const Color primaryLight = Color(0xFF2D4373);
-  static const Color primaryDark = Color(0xFF0F1B33);
-  static const Color primarySurface = Color(0xFFE8EDF5);
+  // ── Primary (Red) ───────────────────────────────────────────────────────
+  static const Color primary = Color(0xFFF01822);
+  static const Color primaryLight = Color(0xFFF4454D);
+  static const Color primaryDark = Color(0xFFBF1018);
+  static const Color primarySurface = Color(0xFFFEE8E9);
 
-  // ── Accent (Blue) ───────────────────────────────────────────────────────
-  static const Color accent = Color(0xFF2563EB);
-  static const Color accentLight = Color(0xFF60A5FA);
-  static const Color accentSurface = Color(0xFFEFF6FF);
+  // ── Accent (Red) ────────────────────────────────────────────────────────
+  static const Color accent = Color(0xFFF01822);
+  static const Color accentLight = Color(0xFFF4454D);
+  static const Color accentSurface = Color(0xFFFEE8E9);
 
   // ── Semantic Colors ─────────────────────────────────────────────────────
   static const Color success = Color(0xFF16A34A);

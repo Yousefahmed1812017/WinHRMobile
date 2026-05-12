@@ -8,7 +8,6 @@ import '../../../../core/routing/route_names.dart';
 import '../../data/employees_provider.dart';
 import '../../data/models/employee_model.dart';
 
-/// Employees list screen with search by code and pagination — modernized.
 class EmployeesListScreen extends ConsumerStatefulWidget {
   const EmployeesListScreen({super.key});
 
@@ -19,276 +18,349 @@ class EmployeesListScreen extends ConsumerStatefulWidget {
 
 class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
   final _searchController = TextEditingController();
-  final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(employeesListProvider.notifier).loadEmployees();
-    });
-    _scrollController.addListener(_onScroll);
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      final state = ref.read(employeesListProvider);
-      if (!state.isLoadingMore && state.hasMore && state.searchCode == null) {
-        ref.read(employeesListProvider.notifier).loadMore();
-      }
-    }
+    Future.microtask(() =>
+        ref.read(subordinatesProvider.notifier).load());
   }
 
   @override
   void dispose() {
     _searchController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
-  void _onSearch() {
-    final code = _searchController.text.trim();
-    if (code.isNotEmpty) {
-      ref.read(employeesListProvider.notifier).searchByCode(code);
-    }
+  void _onSearch(String value) {
+    ref.read(subordinatesProvider.notifier).search(value.trim());
   }
 
-  void _onClearSearch() {
+  void _clearSearch() {
     _searchController.clear();
-    ref.read(employeesListProvider.notifier).clearSearch();
+    ref.read(subordinatesProvider.notifier).clearSearch();
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(employeesListProvider);
+    final state = ref.watch(subordinatesProvider);
+    final list = state.filtered;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(
-          'قائمة الموظفين',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 20),
-        ),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 1,
+        centerTitle: false,
         automaticallyImplyLeading: false,
-        actions: [
-          if (state.pagination != null && !state.isLoading)
-            Center(
-              child: Padding(
-                padding: const EdgeInsetsDirectional.only(end: 16),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'الموظفين',
+              style: GoogleFonts.cairo(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            if (state.pagination != null && !state.isLoading)
+              Text(
+                '${state.pagination!.totalRecords} موظف',
+                style: GoogleFonts.cairo(
+                  fontSize: 12,
+                  color: AppColors.textTertiary,
+                ),
+              ),
+          ],
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: Container(
+              height: 42,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceVariant,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: TextField(
+                controller: _searchController,
+                onChanged: _onSearch,
+                style: GoogleFonts.cairo(fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'بحث بالاسم أو الكود...',
+                  hintStyle: GoogleFonts.cairo(
+                    fontSize: 13,
+                    color: AppColors.textTertiary,
                   ),
-                  child: Text(
-                    '${state.pagination!.totalRecords} موظف',
-                    style: GoogleFonts.cairo(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
+                  prefixIcon: const Icon(Icons.search_rounded,
+                      size: 20, color: AppColors.textTertiary),
+                  suffixIcon: state.searchQuery.isNotEmpty
+                      ? GestureDetector(
+                          onTap: _clearSearch,
+                          child: const Icon(Icons.close_rounded,
+                              size: 18, color: AppColors.textTertiary),
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 11),
                 ),
               ),
             ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // ── Search Bar ──────────────────────────────────────────────
-          Container(
-            color: AppColors.surface,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.border, width: 0.5),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.search,
-                      onSubmitted: (_) => _onSearch(),
-                      style: GoogleFonts.cairo(fontSize: 15),
-                      decoration: InputDecoration(
-                        hintText: 'بحث بكود الموظف...',
-                        hintStyle: GoogleFonts.cairo(
-                          color: AppColors.textTertiary,
-                          fontSize: 14,
-                        ),
-                        prefixIcon: const Icon(
-                          Icons.search_rounded,
-                          color: AppColors.textTertiary,
-                        ),
-                        suffixIcon: state.searchCode != null
-                            ? IconButton(
-                                icon: const Icon(Icons.close_rounded,
-                                    color: AppColors.textTertiary),
-                                onPressed: _onClearSearch,
-                              )
-                            : null,
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsetsDirectional.only(end: 6),
-                    child: Material(
-                      color: AppColors.accent,
-                      borderRadius: BorderRadius.circular(10),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(10),
-                        onTap: _onSearch,
-                        child: const Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Icon(Icons.search, color: Colors.white, size: 22),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
-
-          // ── Content ─────────────────────────────────────────────────
-          Expanded(
-            child: _buildContent(state),
-          ),
-        ],
+        ),
       ),
+      body: _buildBody(state, list),
     );
   }
 
-  Widget _buildContent(EmployeesListState state) {
-    if (state.isLoading && state.employees.isEmpty) {
+  Widget _buildBody(SubordinatesState state, List<Employee> list) {
+    if (state.isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.accent),
+        child: CircularProgressIndicator(
+            color: AppColors.primary, strokeWidth: 2.5),
       );
     }
 
     if (state.errorMessage != null && state.employees.isEmpty) {
       return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.dangerLight,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(Icons.error_outline_rounded,
-                    size: 32, color: AppColors.danger),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'حدث خطأ',
-                style: GoogleFonts.cairo(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                state.errorMessage!,
-                style: GoogleFonts.cairo(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: () =>
-                    ref.read(employeesListProvider.notifier).loadEmployees(),
-                icon: const Icon(Icons.refresh_rounded),
-                label: Text('إعادة المحاولة',
-                    style: GoogleFonts.cairo(fontWeight: FontWeight.w600)),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (state.employees.isEmpty) {
-      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(Icons.people_outline_rounded,
-                  size: 32,
-                  color: AppColors.textTertiary.withValues(alpha: 0.5)),
-            ),
+            const Icon(Icons.wifi_off_rounded,
+                size: 40, color: AppColors.textTertiary),
+            const SizedBox(height: 12),
+            Text('تعذّر الاتصال',
+                style: GoogleFonts.cairo(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary)),
             const SizedBox(height: 16),
-            Text(
-              'لا توجد نتائج',
-              style: GoogleFonts.cairo(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
-              ),
+            TextButton(
+              onPressed: () =>
+                  ref.read(subordinatesProvider.notifier).load(),
+              child: Text('إعادة المحاولة',
+                  style: GoogleFonts.cairo(color: AppColors.primary)),
             ),
           ],
         ),
       );
     }
 
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.all(16),
-      itemCount: state.employees.length + (state.isLoadingMore ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index == state.employees.length) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(
-              child: CircularProgressIndicator(color: AppColors.accent),
+    if (list.isEmpty) {
+      return Center(
+        child: Text(
+          state.searchQuery.isNotEmpty ? 'لا توجد نتائج' : 'لا يوجد موظفون',
+          style: GoogleFonts.cairo(
+              fontSize: 15, color: AppColors.textTertiary),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: () => ref.read(subordinatesProvider.notifier).load(),
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        itemCount: list.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
+        itemBuilder: (context, index) => _EmployeeCard(
+          employee: list[index],
+          onTap: () => _showActions(context, list[index]),
+        ),
+      ),
+    );
+  }
+
+  void _showActions(BuildContext context, Employee employee) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _ActionSheet(employee: employee),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Action Bottom Sheet
+// ─────────────────────────────────────────────────────────────────────────────
+class _ActionSheet extends StatelessWidget {
+  final Employee employee;
+  const _ActionSheet({required this.employee});
+
+  static const _actions = [
+    _Action(icon: Icons.event_busy_rounded,   label: 'غياب',            color: Color(0xFFEF4444), leaveTypeId: null,  isAbsence: true),
+    _Action(icon: Icons.beach_access_rounded, label: 'إجازة سنوية',     color: Color(0xFF2563EB), leaveTypeId: 3,    isAbsence: false),
+    _Action(icon: Icons.free_breakfast_rounded, label: 'إجازة عارضة',   color: Color(0xFF16A34A), leaveTypeId: 24,   isAbsence: false),
+    _Action(icon: Icons.money_off_rounded,    label: 'إجازة خصم',       color: Color(0xFFF59E0B), leaveTypeId: 25,   isAbsence: false),
+    _Action(icon: Icons.work_outline_rounded, label: 'مأمورية',          color: Color(0xFF7C3AED), leaveTypeId: null,  isAbsence: false),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Handle
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
             ),
-          );
-        }
-        return _EmployeeCard(
-          employee: state.employees[index],
-          onTap: () {
-            context.push(
-              RouteNames.employeeDetails,
-              extra: state.employees[index],
-            );
-          },
-        );
+            const SizedBox(height: 16),
+
+            // Employee name
+            Text(
+              employee.fullNameAr,
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            Text(
+              'كود: ${employee.code}  •  ${employee.jobTitle ?? ''}',
+              style: GoogleFonts.cairo(
+                fontSize: 12,
+                color: AppColors.textTertiary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Divider(height: 1),
+            const SizedBox(height: 8),
+
+            // Actions grid
+            GridView.count(
+              crossAxisCount: 3,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 1.1,
+              children: _actions.map((action) {
+                return _ActionTile(
+                  action: action,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigate(context, action);
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigate(BuildContext context, _Action action) {
+    if (action.isAbsence) {
+      // TODO: navigate to absence registration screen
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تسجيل الغياب — قريباً',
+              style: GoogleFonts.cairo()),
+          backgroundColor: AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (action.leaveTypeId == null) {
+      // مأمورية — TODO: navigate to mission screen
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('المأمورية — قريباً',
+              style: GoogleFonts.cairo()),
+          backgroundColor: AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    context.push(
+      RouteNames.createLeaveRequest,
+      extra: {
+        'employee': employee,
+        'leaveTypeId': action.leaveTypeId,
       },
     );
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-//  Modernized Employee Card Widget
-// ═══════════════════════════════════════════════════════════════════════════
+class _ActionTile extends StatelessWidget {
+  final _Action action;
+  final VoidCallback onTap;
+  const _ActionTile({required this.action, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: action.color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: action.color.withValues(alpha: 0.15),
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(action.icon, color: action.color, size: 26),
+            const SizedBox(height: 6),
+            Text(
+              action.label,
+              style: GoogleFonts.cairo(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: action.color,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Action {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final int? leaveTypeId;
+  final bool isAbsence;
+  const _Action({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.leaveTypeId,
+    required this.isAbsence,
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Employee Card
+// ─────────────────────────────────────────────────────────────────────────────
 class _EmployeeCard extends StatelessWidget {
   final Employee employee;
   final VoidCallback onTap;
@@ -297,214 +369,70 @@ class _EmployeeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              children: [
-                // ── Avatar with gradient ──────────────────────────
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.1),
-                        AppColors.accent.withValues(alpha: 0.08),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(13),
-                    border: Border.all(
-                      color: AppColors.accent.withValues(alpha: 0.12),
-                      width: 1,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      employee.code,
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primary,
-                      ),
-                    ),
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              // Avatar
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  employee.code,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
                   ),
                 ),
-                const SizedBox(width: 12),
+              ),
+              const SizedBox(width: 12),
 
-                // ── Info ──────────────────────────────────────────
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+              // Name + job
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      employee.fullNameAr,
+                      style: GoogleFonts.cairo(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (employee.jobTitle != null)
                       Text(
-                        employee.fullNameAr,
+                        employee.jobTitle!,
                         style: GoogleFonts.cairo(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          fontSize: 11,
+                          color: AppColors.textTertiary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 3),
-                      if (employee.jobTitle != null)
-                        Row(
-                          children: [
-                            Icon(Icons.work_outline_rounded,
-                                size: 13,
-                                color: AppColors.textTertiary
-                                    .withValues(alpha: 0.7)),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                employee.jobTitle!,
-                                style: GoogleFonts.cairo(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      if (employee.department != null)
-                        Row(
-                          children: [
-                            Icon(Icons.business_outlined,
-                                size: 13,
-                                color: AppColors.textTertiary
-                                    .withValues(alpha: 0.7)),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                employee.department!,
-                                style: GoogleFonts.cairo(
-                                  fontSize: 11,
-                                  color: AppColors.textTertiary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-
-                // ── Status + Arrow ───────────────────────────────
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _StatusBadge(employee: employee),
-                    if (employee.shiftType != null) ...[
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceVariant,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          employee.shiftType!,
-                          style: GoogleFonts.cairo(
-                            fontSize: 10,
-                            color: AppColors.textTertiary,
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
+              ),
+              const SizedBox(width: 8),
 
-                const SizedBox(width: 4),
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.chevron_left_rounded,
-                    color: AppColors.textTertiary,
-                    size: 18,
-                  ),
-                ),
-              ],
-            ),
+              const Icon(Icons.chevron_left_rounded,
+                  size: 20, color: AppColors.textTertiary),
+            ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StatusBadge extends StatelessWidget {
-  final Employee employee;
-  const _StatusBadge({required this.employee});
-
-  @override
-  Widget build(BuildContext context) {
-    Color bg;
-    Color fg;
-    String label;
-
-    if (employee.isActive) {
-      bg = AppColors.activeBg;
-      fg = AppColors.activeFg;
-      label = 'يعمل';
-    } else if (employee.isRetired) {
-      bg = AppColors.retiredBg;
-      fg = AppColors.retiredFg;
-      label = 'متقاعد';
-    } else if (employee.isDeceased) {
-      bg = AppColors.deceasedBg;
-      fg = AppColors.deceasedFg;
-      label = 'وفاة';
-    } else {
-      bg = AppColors.surfaceVariant;
-      fg = AppColors.textSecondary;
-      label = employee.employeeStatus ?? '-';
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.cairo(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: fg,
         ),
       ),
     );

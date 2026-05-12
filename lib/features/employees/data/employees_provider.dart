@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../../core/constants/storage_keys.dart';
 import 'employees_repository.dart';
 import 'models/employee_model.dart';
 
@@ -153,4 +155,90 @@ class EmployeesListNotifier extends StateNotifier<EmployeesListState> {
 final employeesListProvider =
     StateNotifierProvider<EmployeesListNotifier, EmployeesListState>((ref) {
   return EmployeesListNotifier(ref.read(employeesRepositoryProvider));
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Subordinates (manager's team)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class SubordinatesState {
+  final List<Employee> employees;
+  final PaginationInfo? pagination;
+  final bool isLoading;
+  final String? errorMessage;
+  final String searchQuery;
+
+  const SubordinatesState({
+    this.employees = const [],
+    this.pagination,
+    this.isLoading = false,
+    this.errorMessage,
+    this.searchQuery = '',
+  });
+
+  SubordinatesState copyWith({
+    List<Employee>? employees,
+    PaginationInfo? pagination,
+    bool? isLoading,
+    String? errorMessage,
+    String? searchQuery,
+    bool clearError = false,
+  }) {
+    return SubordinatesState(
+      employees: employees ?? this.employees,
+      pagination: pagination ?? this.pagination,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      searchQuery: searchQuery ?? this.searchQuery,
+    );
+  }
+
+  List<Employee> get filtered {
+    if (searchQuery.isEmpty) return employees;
+    final q = searchQuery.toLowerCase();
+    return employees.where((e) =>
+        e.code.contains(q) ||
+        e.fullNameAr.toLowerCase().contains(q)).toList();
+  }
+}
+
+class SubordinatesNotifier extends StateNotifier<SubordinatesState> {
+  final EmployeesRepository _repo;
+
+  SubordinatesNotifier(this._repo) : super(const SubordinatesState());
+
+  Future<void> load() async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      const storage = FlutterSecureStorage();
+      final idStr = await storage.read(key: StorageKeys.userEmployeeId);
+      final managerId = int.tryParse(idStr ?? '');
+      if (managerId == null) {
+        state = state.copyWith(
+            isLoading: false, errorMessage: 'لم يتم العثور على بيانات المدير');
+        return;
+      }
+      final response = await _repo.getSubordinates(managerId: managerId);
+      state = state.copyWith(
+        isLoading: false,
+        employees: response.employees,
+        pagination: response.pagination,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
+  void search(String query) {
+    state = state.copyWith(searchQuery: query);
+  }
+
+  void clearSearch() {
+    state = state.copyWith(searchQuery: '');
+  }
+}
+
+final subordinatesProvider =
+    StateNotifierProvider<SubordinatesNotifier, SubordinatesState>((ref) {
+  return SubordinatesNotifier(ref.read(employeesRepositoryProvider));
 });

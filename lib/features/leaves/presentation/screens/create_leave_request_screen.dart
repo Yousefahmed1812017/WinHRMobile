@@ -14,10 +14,14 @@ import '../../data/models/leave_request_model.dart';
 
 /// Create leave request screen — 2-step flow (form → confirmation).
 class CreateLeaveRequestScreen extends ConsumerStatefulWidget {
-  /// If provided, the employee is pre-filled and locked.
   final Employee? prefilledEmployee;
+  final int? prefilledLeaveTypeId;
 
-  const CreateLeaveRequestScreen({super.key, this.prefilledEmployee});
+  const CreateLeaveRequestScreen({
+    super.key,
+    this.prefilledEmployee,
+    this.prefilledLeaveTypeId,
+  });
 
   @override
   ConsumerState<CreateLeaveRequestScreen> createState() =>

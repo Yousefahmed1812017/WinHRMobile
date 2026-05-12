@@ -12,7 +12,7 @@ class WinHRApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Win HR',
+      title: 'Lock Sys HR',
       debugShowCheckedModeBanner: false,
 
       // ── Theme ──────────────────────────────────────────────────────
