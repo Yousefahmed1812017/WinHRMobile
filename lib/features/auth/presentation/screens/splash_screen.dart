@@ -231,7 +231,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   children: [
                     Text(
                       'شركة',
-                      style: GoogleFonts.cairo(
+                      style: GoogleFonts.ibmPlexSansArabic(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
                         color: AppColors.textTertiary,
@@ -242,7 +242,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     Text(
                       'الدلتا للأسمدة والصناعات الكيماوية',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
+                      style: GoogleFonts.ibmPlexSansArabic(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,

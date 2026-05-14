@@ -106,7 +106,7 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
             ),
             const SizedBox(height: 16),
             Text(message,
-                style: GoogleFonts.cairo(
+                style: GoogleFonts.ibmPlexSansArabic(
                     fontSize: 15, fontWeight: FontWeight.w600),
                 textAlign: TextAlign.center),
           ],
@@ -118,7 +118,7 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
               context.pop();
             },
             child: Text('تم',
-                style: GoogleFonts.cairo(
+                style: GoogleFonts.ibmPlexSansArabic(
                     color: AppColors.primary, fontWeight: FontWeight.w700)),
           ),
         ],
@@ -130,7 +130,7 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content:
-            Text(message, style: GoogleFonts.cairo(color: Colors.white)),
+            Text(message, style: GoogleFonts.ibmPlexSansArabic(color: Colors.white)),
         backgroundColor: AppColors.danger,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -146,7 +146,7 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text('تسجيل غياب',
-            style: GoogleFonts.cairo(
+            style: GoogleFonts.ibmPlexSansArabic(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary)),
@@ -190,13 +190,13 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(widget.employee.fullNameAr,
-                            style: GoogleFonts.cairo(
+                            style: GoogleFonts.ibmPlexSansArabic(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary)),
                         if (widget.employee.jobTitle != null)
                           Text(widget.employee.jobTitle!,
-                              style: GoogleFonts.cairo(
+                              style: GoogleFonts.ibmPlexSansArabic(
                                   fontSize: 11,
                                   color: AppColors.textTertiary)),
                       ],
@@ -210,7 +210,7 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
 
             // Date pickers
             Text('الفترة الزمنية',
-                style: GoogleFonts.cairo(
+                style: GoogleFonts.ibmPlexSansArabic(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary)),
@@ -255,7 +255,7 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
                   const SizedBox(width: 8),
                   Text(
                     'عدد أيام الغياب: $_days ${_days == 1 ? 'يوم' : 'أيام'}',
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.ibmPlexSansArabic(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFFEF4444)),
@@ -287,7 +287,7 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
                             color: Colors.white, strokeWidth: 2.5),
                       )
                     : Text('تسجيل الغياب',
-                        style: GoogleFonts.cairo(
+                        style: GoogleFonts.ibmPlexSansArabic(
                             fontSize: 16, fontWeight: FontWeight.w700)),
               ),
             ),
@@ -321,7 +321,7 @@ class _DateCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label,
-                style: GoogleFonts.cairo(
+                style: GoogleFonts.ibmPlexSansArabic(
                     fontSize: 11, color: AppColors.textTertiary)),
             const SizedBox(height: 4),
             Row(
@@ -330,7 +330,7 @@ class _DateCard extends StatelessWidget {
                     size: 14, color: AppColors.primary),
                 const SizedBox(width: 6),
                 Text(date,
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.ibmPlexSansArabic(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary)),

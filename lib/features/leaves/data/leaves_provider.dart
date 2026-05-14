@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../auth/data/auth_provider.dart';
 
 import 'leaves_repository.dart';
 import 'models/leave_request_model.dart';
@@ -49,15 +50,17 @@ class LeaveRequestsListState {
 class LeaveRequestsListNotifier
     extends StateNotifier<LeaveRequestsListState> {
   final LeavesRepository _repo;
+  final AuthState _authState;
 
-  LeaveRequestsListNotifier(this._repo)
+  LeaveRequestsListNotifier(this._repo, this._authState)
       : super(const LeaveRequestsListState());
 
-  /// Load all leave requests (no filter).
+  /// Load all leave requests (no filter), but use managerId if applicable.
   Future<void> loadAll() async {
     state = state.copyWith(isLoading: true, clearError: true, clearSearch: true);
     try {
-      final response = await _repo.getLeaveRequests();
+      final managerId = _authState.user?.employeeId;
+      final response = await _repo.getLeaveRequests(managerId: managerId);
       state = state.copyWith(
         requests: response.data,
         pagination: response.pagination,
@@ -125,7 +128,8 @@ class LeaveRequestsListNotifier
 
 final leaveRequestsListProvider = StateNotifierProvider<
     LeaveRequestsListNotifier, LeaveRequestsListState>((ref) {
-  return LeaveRequestsListNotifier(ref.read(leavesRepositoryProvider));
+  return LeaveRequestsListNotifier(
+      ref.read(leavesRepositoryProvider), ref.read(authStateProvider));
 });
 
 // ═══════════════════════════════════════════════════════════════════════════

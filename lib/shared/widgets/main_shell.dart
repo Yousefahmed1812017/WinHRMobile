@@ -13,8 +13,10 @@ class MainShell extends StatelessWidget {
   static int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     if (location.startsWith('/leave')) return 1;
-    if (location.startsWith('/profile')) return 2;
-    return 0;
+    if (location.startsWith('/attendance')) return 2;
+    if (location.startsWith('/employees')) return 3;
+    if (location.startsWith('/profile')) return 4;
+    return 0; // home is default/fallback or 0
   }
 
   @override
@@ -37,16 +39,16 @@ class MainShell extends StatelessWidget {
         child: SafeArea(
           child: Container(
             height: 64,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _NavItem(
-                  icon: Icons.people_alt_outlined,
-                  activeIcon: Icons.people_alt_rounded,
-                  label: 'الموظفين',
+                  icon: Icons.home_outlined,
+                  activeIcon: Icons.home_rounded,
+                  label: 'الرئيسية',
                   isActive: currentIndex == 0,
-                  onTap: () => context.go(RouteNames.employees),
+                  onTap: () => context.go(RouteNames.home),
                 ),
                 _NavItem(
                   icon: Icons.event_note_outlined,
@@ -56,10 +58,24 @@ class MainShell extends StatelessWidget {
                   onTap: () => context.go(RouteNames.leaveRequests),
                 ),
                 _NavItem(
+                  icon: Icons.fingerprint_outlined,
+                  activeIcon: Icons.fingerprint_rounded,
+                  label: 'الحضور',
+                  isActive: currentIndex == 2,
+                  onTap: () => context.go(RouteNames.attendance),
+                ),
+                _NavItem(
+                  icon: Icons.people_alt_outlined,
+                  activeIcon: Icons.people_alt_rounded,
+                  label: 'الموظفين',
+                  isActive: currentIndex == 3,
+                  onTap: () => context.go(RouteNames.employees),
+                ),
+                _NavItem(
                   icon: Icons.person_outline_rounded,
                   activeIcon: Icons.person_rounded,
                   label: 'حسابي',
-                  isActive: currentIndex == 2,
+                  isActive: currentIndex == 4,
                   onTap: () => context.go(RouteNames.profile),
                 ),
               ],
@@ -117,7 +133,7 @@ class _NavItem extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 label,
-                style: GoogleFonts.cairo(
+                style: GoogleFonts.ibmPlexSansArabic(
                   fontSize: 11,
                   fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                   color: isActive ? AppColors.accent : AppColors.textTertiary,

@@ -69,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     // Listen for auth state changes
     ref.listen<AuthState>(authStateProvider, (prev, next) {
       if (next.status == AuthStatus.authenticated) {
-        context.go(RouteNames.employees);
+        context.go(RouteNames.home);
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -80,7 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 Expanded(
                   child: Text(
                     next.errorMessage!,
-                    style: GoogleFonts.cairo(fontSize: 14),
+                    style: GoogleFonts.ibmPlexSansArabic(fontSize: 14),
                   ),
                 ),
               ],
@@ -165,7 +165,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       const SizedBox(height: 4),
                       Text(
                         'بوابة الموارد البشرية',
-                        style: GoogleFonts.cairo(
+                        style: GoogleFonts.ibmPlexSansArabic(
                           fontSize: 14,
                           color: AppColors.textSecondary,
                         ),
@@ -195,7 +195,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               // Title
                               Text(
                                 'تسجيل الدخول',
-                                style: GoogleFonts.cairo(
+                                style: GoogleFonts.ibmPlexSansArabic(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.textPrimary,
@@ -205,7 +205,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               const SizedBox(height: 4),
                               Text(
                                 'أدخل بياناتك للوصول إلى حسابك',
-                                style: GoogleFonts.cairo(
+                                style: GoogleFonts.ibmPlexSansArabic(
                                   fontSize: 13,
                                   color: AppColors.textTertiary,
                                 ),
@@ -216,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               // Username field
                               Text(
                                 'اسم المستخدم',
-                                style: GoogleFonts.cairo(
+                                style: GoogleFonts.ibmPlexSansArabic(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
@@ -226,7 +226,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               TextFormField(
                                 controller: _usernameController,
                                 textInputAction: TextInputAction.next,
-                                style: GoogleFonts.cairo(fontSize: 15),
+                                style: GoogleFonts.ibmPlexSansArabic(fontSize: 15),
                                 decoration: InputDecoration(
                                   hintText: 'أدخل اسم المستخدم',
                                   prefixIcon: Icon(
@@ -274,7 +274,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               // Password field
                               Text(
                                 'كلمة المرور',
-                                style: GoogleFonts.cairo(
+                                style: GoogleFonts.ibmPlexSansArabic(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
@@ -285,7 +285,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
                                 textInputAction: TextInputAction.done,
-                                style: GoogleFonts.cairo(fontSize: 15),
+                                style: GoogleFonts.ibmPlexSansArabic(fontSize: 15),
                                 onFieldSubmitted: (_) => _handleLogin(),
                                 decoration: InputDecoration(
                                   hintText: '••••••',
@@ -378,7 +378,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                             const SizedBox(width: 8),
                                             Text(
                                               'تسجيل الدخول',
-                                              style: GoogleFonts.cairo(
+                                              style: GoogleFonts.ibmPlexSansArabic(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w700,
                                               ),
@@ -397,7 +397,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       // ── Footer ────────────────────────────────────
                       Text(
                         'الدلتا للأسمدة والصناعات الكيماوية',
-                        style: GoogleFonts.cairo(
+                        style: GoogleFonts.ibmPlexSansArabic(
                           fontSize: 12,
                           color: AppColors.textTertiary,
                         ),

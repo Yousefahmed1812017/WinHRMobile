@@ -16,6 +16,7 @@ class LeavesRepository {
   Future<LeaveRequestsResponse> getLeaveRequests({
     String? employeeCode,
     int? employeeId,
+    int? managerId,
   }) async {
     try {
       final body = <String, dynamic>{};
@@ -24,6 +25,9 @@ class LeavesRepository {
       }
       if (employeeId != null) {
         body['employeeId'] = employeeId.toString();
+      }
+      if (managerId != null) {
+        body['managerId'] = managerId.toString();
       }
 
       final response = await _dio.post(
@@ -82,7 +86,7 @@ class LeavesRepository {
           'leaveReason': leaveReason ?? '',
           'emergencyPhone': emergencyPhone ?? '',
           'notes': notes ?? '',
-          'username': username,
+          'createdBy': username,
           'userId': userId,
         },
       );

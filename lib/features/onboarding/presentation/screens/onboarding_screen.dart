@@ -93,7 +93,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 child: Text(
                   'تخطى',
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.ibmPlexSansArabic(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -152,7 +152,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Text(
                         isLastPage ? 'ابدأ الآن' : 'التالي',
                         key: ValueKey(isLastPage),
-                        style: GoogleFonts.cairo(
+                        style: GoogleFonts.ibmPlexSansArabic(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),

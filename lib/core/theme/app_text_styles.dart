@@ -8,7 +8,7 @@ class AppTextStyles {
 
   // ── Base Font Families ─────────────────────────────────────────────────
 
-  static TextStyle get _cairoBase => GoogleFonts.cairo();
+  static TextStyle get _cairoBase => GoogleFonts.ibmPlexSansArabic();
   static TextStyle get _interBase => GoogleFonts.inter();
 
   /// Returns the appropriate base font based on locale.

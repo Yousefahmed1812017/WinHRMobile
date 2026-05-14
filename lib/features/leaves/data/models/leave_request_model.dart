@@ -51,16 +51,23 @@ class LeaveRequest {
   /// Returns a color-semantic status category.
   String get statusCategory {
     switch (statusId) {
-      case 4:
-        return 'approved'; // معتمد
       case 1:
-        return 'pending'; // معلق
       case 2:
-        return 'rejected'; // مرفوض
+      case 3:
+        return 'pending';   // جديد / قيد الانتظار / قيد المراجعة
+      case 4:
+        return 'approved';  // معتمد
+      case 5:
+        return 'rejected';  // مرفوض
+      case 6:
+        return 'cancelled'; // ملغي
       default:
         return 'other';
     }
   }
+
+  /// Whether the request can be approved or rejected.
+  bool get isPending => statusId == 1 || statusId == 2 || statusId == 3;
 }
 
 /// Data model for a leave type from the lookups API.

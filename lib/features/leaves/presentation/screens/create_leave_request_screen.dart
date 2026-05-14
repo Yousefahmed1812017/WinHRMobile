@@ -137,7 +137,7 @@ class _CreateLeaveRequestScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('يرجى اختيار الموظف',
-              style: GoogleFonts.cairo()),
+              style: GoogleFonts.ibmPlexSansArabic()),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
         ),
@@ -148,7 +148,7 @@ class _CreateLeaveRequestScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('يرجى اختيار نوع الإجازة',
-              style: GoogleFonts.cairo()),
+              style: GoogleFonts.ibmPlexSansArabic()),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
         ),
@@ -159,7 +159,7 @@ class _CreateLeaveRequestScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('يرجى تحديد تاريخ البداية والنهاية',
-              style: GoogleFonts.cairo()),
+              style: GoogleFonts.ibmPlexSansArabic()),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
         ),
@@ -199,7 +199,7 @@ class _CreateLeaveRequestScreenState
               const Icon(Icons.check_circle, color: Colors.white, size: 20),
               const SizedBox(width: 10),
               Text('تم إنشاء طلب الإجازة بنجاح',
-                  style: GoogleFonts.cairo()),
+                  style: GoogleFonts.ibmPlexSansArabic()),
             ],
           ),
           backgroundColor: AppColors.success,
@@ -212,7 +212,7 @@ class _CreateLeaveRequestScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('فشل إنشاء الطلب', style: GoogleFonts.cairo()),
+          content: Text('فشل إنشاء الطلب', style: GoogleFonts.ibmPlexSansArabic()),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
         ),
@@ -229,7 +229,7 @@ class _CreateLeaveRequestScreenState
       appBar: AppBar(
         title: Text(
           _isConfirmationStep ? 'تأكيد الطلب' : 'إنشاء طلب إجازة',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 18),
+          style: GoogleFonts.ibmPlexSansArabic(fontWeight: FontWeight.w700, fontSize: 18),
         ),
         backgroundColor: AppColors.surface,
         leading: IconButton(
@@ -270,7 +270,7 @@ class _CreateLeaveRequestScreenState
               TextFormField(
                 controller: _searchController,
                 keyboardType: TextInputType.number,
-                style: GoogleFonts.cairo(fontSize: 15),
+                style: GoogleFonts.ibmPlexSansArabic(fontSize: 15),
                 decoration: InputDecoration(
                   hintText: 'بحث بكود الموظف...',
                   prefixIcon: const Icon(Icons.search_rounded),
@@ -347,14 +347,14 @@ class _CreateLeaveRequestScreenState
                         ),
                         title: Text(
                           emp.fullNameAr,
-                          style: GoogleFonts.cairo(
+                          style: GoogleFonts.ibmPlexSansArabic(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         subtitle: Text(
                           emp.department ?? '',
-                          style: GoogleFonts.cairo(
+                          style: GoogleFonts.ibmPlexSansArabic(
                             fontSize: 12,
                             color: AppColors.textSecondary,
                           ),
@@ -386,13 +386,13 @@ class _CreateLeaveRequestScreenState
                   prefixIcon: Icon(Icons.event_note_outlined),
                 ),
                 hint: Text('اختر نوع الإجازة',
-                    style: GoogleFonts.cairo(fontSize: 14)),
+                    style: GoogleFonts.ibmPlexSansArabic(fontSize: 14)),
                 items: types
                     .map((t) => DropdownMenuItem(
                           value: t,
                           child: Text(
                             t.nameAr,
-                            style: GoogleFonts.cairo(fontSize: 14),
+                            style: GoogleFonts.ibmPlexSansArabic(fontSize: 14),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ))
@@ -402,7 +402,7 @@ class _CreateLeaveRequestScreenState
               ),
               loading: () => const LinearProgressIndicator(),
               error: (e, _) => Text('خطأ في تحميل أنواع الإجازات',
-                  style: GoogleFonts.cairo(color: AppColors.danger)),
+                  style: GoogleFonts.ibmPlexSansArabic(color: AppColors.danger)),
             ),
 
             const SizedBox(height: 20),
@@ -448,7 +448,7 @@ class _CreateLeaveRequestScreenState
                   const SizedBox(width: 10),
                   Text(
                     'إجمالي الأيام',
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.ibmPlexSansArabic(
                       fontSize: 14,
                       color: AppColors.textSecondary,
                     ),
@@ -456,7 +456,7 @@ class _CreateLeaveRequestScreenState
                   const Spacer(),
                   Text(
                     '$_totalLeaveDays يوم',
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.ibmPlexSansArabic(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColors.accent,
@@ -475,7 +475,7 @@ class _CreateLeaveRequestScreenState
             const SizedBox(height: 8),
             TextFormField(
               controller: _leaveReasonController,
-              style: GoogleFonts.cairo(fontSize: 14),
+              style: GoogleFonts.ibmPlexSansArabic(fontSize: 14),
               maxLines: 2,
               decoration: const InputDecoration(
                 hintText: 'أدخل سبب الإجازة...',
@@ -494,7 +494,7 @@ class _CreateLeaveRequestScreenState
             TextFormField(
               controller: _emergencyPhoneController,
               keyboardType: TextInputType.phone,
-              style: GoogleFonts.cairo(fontSize: 14),
+              style: GoogleFonts.ibmPlexSansArabic(fontSize: 14),
               decoration: const InputDecoration(
                 hintText: '01012345678',
                 prefixIcon: Icon(Icons.phone_outlined),
@@ -520,7 +520,7 @@ class _CreateLeaveRequestScreenState
                   children: [
                     Text(
                       'التالي - مراجعة الطلب',
-                      style: GoogleFonts.cairo(
+                      style: GoogleFonts.ibmPlexSansArabic(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -574,7 +574,7 @@ class _CreateLeaveRequestScreenState
               children: [
                 Text(
                   _selectedEmployee!.fullNameAr,
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.ibmPlexSansArabic(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -583,7 +583,7 @@ class _CreateLeaveRequestScreenState
                 if (_selectedEmployee!.department != null)
                   Text(
                     _selectedEmployee!.department!,
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.ibmPlexSansArabic(
                       fontSize: 12,
                       color: AppColors.textSecondary,
                     ),
@@ -623,7 +623,7 @@ class _CreateLeaveRequestScreenState
                 Expanded(
                   child: Text(
                     'يرجى مراجعة البيانات قبل تأكيد الطلب',
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.ibmPlexSansArabic(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -698,7 +698,7 @@ class _CreateLeaveRequestScreenState
           const SizedBox(height: 8),
           TextFormField(
             controller: _notesController,
-            style: GoogleFonts.cairo(fontSize: 14),
+            style: GoogleFonts.ibmPlexSansArabic(fontSize: 14),
             maxLines: 3,
             decoration: const InputDecoration(
               hintText: 'أدخل ملاحظات إضافية...',
@@ -724,7 +724,7 @@ class _CreateLeaveRequestScreenState
                       ),
                     ),
                     child: Text('رجوع',
-                        style: GoogleFonts.cairo(
+                        style: GoogleFonts.ibmPlexSansArabic(
                             fontWeight: FontWeight.w700, fontSize: 15)),
                   ),
                 ),
@@ -761,7 +761,7 @@ class _CreateLeaveRequestScreenState
                               const SizedBox(width: 8),
                               Text(
                                 'تأكيد الطلب',
-                                style: GoogleFonts.cairo(
+                                style: GoogleFonts.ibmPlexSansArabic(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -798,7 +798,7 @@ class _SectionHeader extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           title,
-          style: GoogleFonts.cairo(
+          style: GoogleFonts.ibmPlexSansArabic(
             fontSize: 14,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -843,14 +843,14 @@ class _DateField extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.ibmPlexSansArabic(
                       fontSize: 11,
                       color: AppColors.textTertiary,
                     ),
                   ),
                   Text(
                     value.isEmpty ? '-- / -- / ----' : value,
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.ibmPlexSansArabic(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: value.isEmpty
@@ -890,7 +890,7 @@ class _ConfirmRow extends StatelessWidget {
             width: 120,
             child: Text(
               label,
-              style: GoogleFonts.cairo(
+              style: GoogleFonts.ibmPlexSansArabic(
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -899,7 +899,7 @@ class _ConfirmRow extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.cairo(
+              style: GoogleFonts.ibmPlexSansArabic(
                 fontSize: 14,
                 fontWeight: highlight ? FontWeight.w800 : FontWeight.w600,
                 color: highlight ? AppColors.accent : AppColors.textPrimary,

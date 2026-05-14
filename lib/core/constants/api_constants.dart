@@ -16,11 +16,14 @@ class ApiConstants {
 
   // ── Employees ──────────────────────────────────────────────────────────
   static const String employees = 'Query/EmployeeList';
-  static const String subordinates = 'Query/ActiveSubordinates';
+  static const String subordinates = 'Query/Subordinates';
 
   // ── Leave Requests ─────────────────────────────────────────────────────
   static const String leaveRequests = 'Query/EmployeeLeaveRequests';
   static const String createLeaveRequest = 'Functions/CreateEmployeeLeaveRequest';
   static const String leaveTypes = 'lookups/leaveTypes';
   static const String createAbsence = 'Functions/CreateAbsence';
+  static const String checkInOut = 'Functions/check-in-out';
+  static const String updateLeaveStatus = 'Functions/UpdateleaveStatus';
+  static const String createCto = 'Functions/CreateCtoTransactions';
 }

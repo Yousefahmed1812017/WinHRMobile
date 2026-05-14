@@ -37,7 +37,7 @@ class AppTheme {
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.cairo(
+        titleTextStyle: GoogleFonts.ibmPlexSansArabic(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.textPrimary,
@@ -71,7 +71,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_borderRadius),
           ),
-          textStyle: GoogleFonts.cairo(
+          textStyle: GoogleFonts.ibmPlexSansArabic(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -87,7 +87,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_borderRadius),
           ),
           side: const BorderSide(color: AppColors.accent),
-          textStyle: GoogleFonts.cairo(
+          textStyle: GoogleFonts.ibmPlexSansArabic(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -98,7 +98,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.accent,
-          textStyle: GoogleFonts.cairo(
+          textStyle: GoogleFonts.ibmPlexSansArabic(
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -131,15 +131,15 @@ class AppTheme {
           borderRadius: BorderRadius.circular(_inputRadius),
           borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
         ),
-        hintStyle: GoogleFonts.cairo(
+        hintStyle: GoogleFonts.ibmPlexSansArabic(
           color: AppColors.textTertiary,
           fontSize: 14,
         ),
-        labelStyle: GoogleFonts.cairo(
+        labelStyle: GoogleFonts.ibmPlexSansArabic(
           color: AppColors.textSecondary,
           fontSize: 14,
         ),
-        errorStyle: GoogleFonts.cairo(
+        errorStyle: GoogleFonts.ibmPlexSansArabic(
           color: AppColors.danger,
           fontSize: 12,
         ),
@@ -151,11 +151,11 @@ class AppTheme {
         backgroundColor: AppColors.surface,
         selectedItemColor: AppColors.accent,
         unselectedItemColor: AppColors.textTertiary,
-        selectedLabelStyle: GoogleFonts.cairo(
+        selectedLabelStyle: GoogleFonts.ibmPlexSansArabic(
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: GoogleFonts.cairo(fontSize: 12),
+        unselectedLabelStyle: GoogleFonts.ibmPlexSansArabic(fontSize: 12),
         elevation: 8,
       ),
 
@@ -171,7 +171,7 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariant,
         selectedColor: AppColors.accentSurface,
-        labelStyle: GoogleFonts.cairo(fontSize: 13),
+        labelStyle: GoogleFonts.ibmPlexSansArabic(fontSize: 13),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -235,7 +235,7 @@ class AppTheme {
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.darkTextPrimary,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.cairo(
+        titleTextStyle: GoogleFonts.ibmPlexSansArabic(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.darkTextPrimary,
@@ -262,7 +262,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_borderRadius),
           ),
-          textStyle: GoogleFonts.cairo(
+          textStyle: GoogleFonts.ibmPlexSansArabic(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -287,11 +287,11 @@ class AppTheme {
           borderSide:
               const BorderSide(color: AppColors.accentLight, width: 1.5),
         ),
-        hintStyle: GoogleFonts.cairo(
+        hintStyle: GoogleFonts.ibmPlexSansArabic(
           color: AppColors.darkTextSecondary,
           fontSize: 14,
         ),
-        labelStyle: GoogleFonts.cairo(
+        labelStyle: GoogleFonts.ibmPlexSansArabic(
           color: AppColors.darkTextSecondary,
           fontSize: 14,
         ),

@@ -5,15 +5,15 @@ class AppColors {
   AppColors._();
 
   // ── Primary (Red) ───────────────────────────────────────────────────────
-  static const Color primary = Color(0xFFF01822);
-  static const Color primaryLight = Color(0xFFF4454D);
-  static const Color primaryDark = Color(0xFFBF1018);
-  static const Color primarySurface = Color(0xFFFEE8E9);
+  static const Color primary = Color(0xFFC62828);
+  static const Color primaryLight = Color(0xFFE53935);
+  static const Color primaryDark = Color(0xFF8E0000);
+  static const Color primarySurface = Color(0xFFFFEBEE);
 
   // ── Accent (Red) ────────────────────────────────────────────────────────
-  static const Color accent = Color(0xFFF01822);
-  static const Color accentLight = Color(0xFFF4454D);
-  static const Color accentSurface = Color(0xFFFEE8E9);
+  static const Color accent = Color(0xFFC62828);
+  static const Color accentLight = Color(0xFFE53935);
+  static const Color accentSurface = Color(0xFFFFEBEE);
 
   // ── Semantic Colors ─────────────────────────────────────────────────────
   static const Color success = Color(0xFF16A34A);

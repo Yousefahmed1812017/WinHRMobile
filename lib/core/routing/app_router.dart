@@ -6,11 +6,15 @@ import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/employees/presentation/screens/create_absence_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/employees/presentation/screens/employees_list_screen.dart';
 import '../../features/employees/presentation/screens/employee_details_screen.dart';
 import '../../features/employees/data/models/employee_model.dart';
+import '../../features/attendance/presentation/screens/attendance_screen.dart';
 import '../../features/leaves/presentation/screens/leave_requests_screen.dart';
 import '../../features/leaves/presentation/screens/create_leave_request_screen.dart';
+import '../../features/leaves/presentation/screens/leave_request_details_screen.dart';
+import '../../features/leaves/data/models/leave_request_model.dart';
 import '../../shared/widgets/main_shell.dart';
 import 'route_names.dart';
 
@@ -46,8 +50,16 @@ class AppRouter {
         builder: (context, state, child) => MainShell(child: child),
         routes: [
           GoRoute(
+            path: RouteNames.home,
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
             path: RouteNames.employees,
             builder: (context, state) => const EmployeesListScreen(),
+          ),
+          GoRoute(
+            path: RouteNames.attendance,
+            builder: (context, state) => const AttendanceScreen(),
           ),
           GoRoute(
             path: RouteNames.leaveRequests,
@@ -86,6 +98,13 @@ class AppRouter {
             );
           }
           return CreateLeaveRequestScreen(prefilledEmployee: extra as Employee?);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.leaveRequestDetails,
+        builder: (context, state) {
+          final request = state.extra as LeaveRequest;
+          return LeaveRequestDetailsScreen(request: request);
         },
       ),
     ],

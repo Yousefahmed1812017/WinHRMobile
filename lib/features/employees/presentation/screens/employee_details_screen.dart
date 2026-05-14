@@ -7,7 +7,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/routing/route_names.dart';
 import '../../data/models/employee_model.dart';
 import '../../../leaves/data/leaves_provider.dart';
-import '../../../leaves/presentation/screens/leave_requests_screen.dart';
 
 /// Employee details screen showing all employee data in organized sections
 /// plus their leave requests.
@@ -52,7 +51,7 @@ class _EmployeeDetailsScreenState
         icon: const Icon(Icons.add_rounded, size: 20),
         label: Text(
           'إنشاء إجازة',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
+          style: GoogleFonts.ibmPlexSansArabic(fontWeight: FontWeight.w700),
         ),
       ),
       body: CustomScrollView(
@@ -105,7 +104,7 @@ class _EmployeeDetailsScreenState
                       const SizedBox(height: 12),
                       Text(
                         widget.employee.fullNameAr,
-                        style: GoogleFonts.cairo(
+                        style: GoogleFonts.ibmPlexSansArabic(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
@@ -123,7 +122,7 @@ class _EmployeeDetailsScreenState
                           ),
                           child: Text(
                             widget.employee.jobTitle!,
-                            style: GoogleFonts.cairo(
+                            style: GoogleFonts.ibmPlexSansArabic(
                               fontSize: 12,
                               color: AppColors.textSecondary,
                             ),
@@ -177,15 +176,6 @@ class _EmployeeDetailsScreenState
                     _InfoRow(
                         label: 'تاريخ التعيين',
                         value: widget.employee.hireDate ?? '-'),
-                    if (widget.employee.jobGradeId != null)
-                      _InfoRow(
-                          label: 'الدرجة الوظيفية',
-                          value: '${widget.employee.jobGradeId}'),
-                    if (widget.employee.jobGradeDate != null &&
-                        widget.employee.jobGradeDate != '-')
-                      _InfoRow(
-                          label: 'تاريخ الدرجة',
-                          value: widget.employee.jobGradeDate!),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -280,7 +270,7 @@ class _EmployeeDetailsScreenState
           const SizedBox(width: 10),
           Text(
             'الحالة: $label',
-            style: GoogleFonts.cairo(
+            style: GoogleFonts.ibmPlexSansArabic(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: fg,
@@ -290,7 +280,7 @@ class _EmployeeDetailsScreenState
           if (widget.employee.hireDate != null)
             Text(
               'تاريخ التعيين: ${widget.employee.hireDate}',
-              style: GoogleFonts.cairo(
+              style: GoogleFonts.ibmPlexSansArabic(
                 fontSize: 12,
                 color: fg.withValues(alpha: 0.8),
               ),
@@ -321,7 +311,7 @@ class _EmployeeDetailsScreenState
             Expanded(
               child: Text(
                 'طلبات الإجازة',
-                style: GoogleFonts.cairo(
+                style: GoogleFonts.ibmPlexSansArabic(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -338,7 +328,7 @@ class _EmployeeDetailsScreenState
                 ),
                 child: Text(
                   '${leaveState.requests.length}',
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.ibmPlexSansArabic(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.accent,
@@ -370,14 +360,14 @@ class _EmployeeDetailsScreenState
                 Expanded(
                   child: Text(
                     'خطأ في تحميل الإجازات',
-                    style: GoogleFonts.cairo(color: AppColors.danger),
+                    style: GoogleFonts.ibmPlexSansArabic(color: AppColors.danger),
                   ),
                 ),
                 TextButton(
                   onPressed: () => ref
                       .read(employeeLeaveRequestsProvider.notifier)
                       .load(widget.employee.code),
-                  child: Text('إعادة', style: GoogleFonts.cairo()),
+                  child: Text('إعادة', style: GoogleFonts.ibmPlexSansArabic()),
                 ),
               ],
             ),
@@ -398,7 +388,7 @@ class _EmployeeDetailsScreenState
                   const SizedBox(height: 8),
                   Text(
                     'لا توجد طلبات إجازة لهذا الموظف',
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.ibmPlexSansArabic(
                       fontSize: 14,
                       color: AppColors.textSecondary,
                     ),
@@ -409,9 +399,72 @@ class _EmployeeDetailsScreenState
           )
         else
           ...leaveState.requests.map(
-            (req) => LeaveCard(request: req),
+            (req) => _SimpleLeaveCard(request: req),
           ),
       ],
+    );
+  }
+}
+
+class _SimpleLeaveCard extends StatelessWidget {
+  final dynamic request;
+  const _SimpleLeaveCard({required this.request});
+
+  @override
+  Widget build(BuildContext context) {
+    Color c;
+    String label;
+    switch (request.statusId) {
+      case 1: case 2: case 3:
+        c = AppColors.warning; label = 'معلق'; break;
+      case 4:
+        c = AppColors.success; label = 'معتمد'; break;
+      case 5:
+        c = AppColors.danger; label = 'مرفوض'; break;
+      default:
+        c = AppColors.info; label = 'أخرى';
+    }
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(
+              color: c.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.event_note_rounded, size: 20, color: c),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(request.leaveType ?? '-',
+                  style: GoogleFonts.ibmPlexSansArabic(fontSize: 13, fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary)),
+                Text('${request.startDate ?? "-"} → ${request.endDate ?? "-"}',
+                  style: GoogleFonts.ibmPlexSansArabic(fontSize: 11, color: AppColors.textTertiary)),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: c.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(label,
+              style: GoogleFonts.ibmPlexSansArabic(fontSize: 10, fontWeight: FontWeight.w700, color: c)),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -465,7 +518,7 @@ class _SectionCard extends StatelessWidget {
                 const SizedBox(width: 10),
                 Text(
                   title,
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.ibmPlexSansArabic(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -503,7 +556,7 @@ class _InfoRow extends StatelessWidget {
             width: 130,
             child: Text(
               label,
-              style: GoogleFonts.cairo(
+              style: GoogleFonts.ibmPlexSansArabic(
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -512,7 +565,7 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.cairo(
+              style: GoogleFonts.ibmPlexSansArabic(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
