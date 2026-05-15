@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/constants/api_constants.dart';
 import '../../../core/network/dio_client.dart';
+import 'models/employee_attendance_model.dart';
 import 'models/employee_model.dart';
 
 /// Repository for fetching employee data from the Delta ORDS API.
@@ -41,6 +42,7 @@ class EmployeesRepository {
     int pageNumber = 0,
     int pageSize = 50,
     String? employeeCode,
+    String? checkDate,
   }) async {
     try {
       final response = await _dio.post(
@@ -51,6 +53,7 @@ class EmployeesRepository {
           'employeeCode': employeeCode != null
               ? (int.tryParse(employeeCode) ?? employeeCode)
               : null,
+          if (checkDate != null) 'checkDate': checkDate,
           'pageNumber': pageNumber,
           'pageSize': pageSize,
         },
@@ -76,6 +79,33 @@ class EmployeesRepository {
       return EmployeesResponse.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       debugPrint('[EmployeesRepository] searchByCode error: ${e.message}');
+      rethrow;
+    }
+  }
+
+  /// Fetches monthly attendance log for a specific employee.
+  Future<EmployeeAttendanceResponse> getEmployeeAttendanceLog({
+    required int employeeId,
+    required String fromDate,
+    required String toDate,
+    int pageNumber = 0,
+    int pageSize = 100,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.employeeAttendanceLog,
+        data: {
+          'employeeId': employeeId,
+          'fromDate': fromDate,
+          'toDate': toDate,
+          'pageNumber': pageNumber,
+          'pageSize': pageSize,
+        },
+      );
+      return EmployeeAttendanceResponse.fromJson(
+          response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      debugPrint('[EmployeesRepository] getEmployeeAttendanceLog error: ${e.message}');
       rethrow;
     }
   }

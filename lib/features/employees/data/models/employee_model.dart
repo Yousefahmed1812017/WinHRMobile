@@ -22,6 +22,12 @@ class Employee {
   final int? employmentStatus;
   final String? employeeStatus;
 
+  // New attendance fields for subordinates query
+  final String? checkInTime;
+  final String? checkOutTime;
+  final String? attendanceStatus;
+  final String? attendanceStatusAr;
+
   const Employee({
     required this.employeeId,
     required this.code,
@@ -44,14 +50,18 @@ class Employee {
     this.qualificationId,
     this.employmentStatus,
     this.employeeStatus,
+    this.checkInTime,
+    this.checkOutTime,
+    this.attendanceStatus,
+    this.attendanceStatusAr,
   });
 
   factory Employee.fromJson(Map<String, dynamic> json) {
     return Employee(
       employeeId: json['employeeId'] as int,
       code: json['code']?.toString() ?? '',
-      fullNameAr: json['fullNameAr'] as String? ?? '',
-      fullNameEn: json['fullNameEn'] as String? ?? '',
+      fullNameAr: json['fullNameAr'] as String? ?? json['employeeName'] as String? ?? json['fullName'] as String? ?? '',
+      fullNameEn: json['fullNameEn'] as String? ?? json['employeeNameEn'] as String? ?? json['fullName'] as String? ?? '',
       jobTitle: json['jobTitle'] as String?,
       department: json['department'] as String?,
       hireDate: json['hireDate'] as String?,
@@ -69,6 +79,10 @@ class Employee {
       qualificationId: json['qualificationId'] as int?,
       employmentStatus: json['employmentStatus'] as int?,
       employeeStatus: json['employeeStatus'] as String?,
+      checkInTime: json['checkInTime'] as String?,
+      checkOutTime: json['checkOutTime'] as String?,
+      attendanceStatus: json['attendanceStatus'] as String?,
+      attendanceStatusAr: json['attendanceStatusAr'] as String?,
     );
   }
 

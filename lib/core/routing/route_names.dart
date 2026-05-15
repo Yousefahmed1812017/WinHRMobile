@@ -11,6 +11,7 @@ class RouteNames {
   static const String home = '/home';
   static const String employees = '/employees';
   static const String employeeDetails = '/employees/details';
+  static const String employeeAttendance = '/employees/attendance';
   static const String leaveRequests = '/leave-requests';
   static const String createLeaveRequest = '/leave-requests/create';
   static const String leaveRequestDetails = '/leave-requests/details';

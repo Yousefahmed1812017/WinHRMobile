@@ -1,16 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/constants/api_constants.dart';
+import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/network/dio_client.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/routing/route_names.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../auth/data/auth_provider.dart';
-import '../../../leaves/data/leaves_provider.dart';
 import '../../data/employees_provider.dart';
 import '../../data/models/employee_model.dart';
 
@@ -24,6 +25,8 @@ class EmployeesListScreen extends ConsumerStatefulWidget {
 
 class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
   final _searchController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
+  final _dateFmt = DateFormat('dd/MM/yyyy');
 
   @override
   void initState() {
@@ -148,14 +151,109 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
-                  _FilterTab(label: 'الكل', count: '${state.pagination?.totalRecords ?? 0}', isActive: false),
+                  GestureDetector(
+                    onTap: () => ref.read(subordinatesProvider.notifier).setStatusFilter('ALL'),
+                    child: _FilterTab(
+                      label: 'الكل',
+                      count: '${state.employees.length}',
+                      isActive: state.statusFilter == 'ALL',
+                    ),
+                  ),
                   const SizedBox(width: 16),
-                  _FilterTab(label: 'يعمل', count: '${list.length}', isActive: true),
+                  GestureDetector(
+                    onTap: () => ref.read(subordinatesProvider.notifier).setStatusFilter('PRESENT'),
+                    child: _FilterTab(
+                      label: 'حاضر',
+                      count: '${state.employees.where((e) => e.attendanceStatus == 'PRESENT_COMPLETE' || e.attendanceStatus == 'PRESENT_NO_OUT').length}',
+                      isActive: state.statusFilter == 'PRESENT',
+                    ),
+                  ),
                   const SizedBox(width: 16),
-                  _FilterTab(label: 'إجازة', count: '0', isActive: false),
+                  GestureDetector(
+                    onTap: () => ref.read(subordinatesProvider.notifier).setStatusFilter('LEAVE'),
+                    child: _FilterTab(
+                      label: 'إجازة',
+                      count: '${state.employees.where((e) => e.attendanceStatus == 'LEAVE').length}',
+                      isActive: state.statusFilter == 'LEAVE',
+                    ),
+                  ),
                   const SizedBox(width: 16),
-                  _FilterTab(label: 'غياب', count: '0', isActive: false),
+                  GestureDetector(
+                    onTap: () => ref.read(subordinatesProvider.notifier).setStatusFilter('ABSENT'),
+                    child: _FilterTab(
+                      label: 'غائب',
+                      count: '${state.employees.where((e) => e.attendanceStatus == 'ABSENT').length}',
+                      isActive: state.statusFilter == 'ABSENT',
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  GestureDetector(
+                    onTap: () => ref.read(subordinatesProvider.notifier).setStatusFilter('NOT_PRESENT'),
+                    child: _FilterTab(
+                      label: 'لم يحضر',
+                      count: '${state.employees.where((e) => e.attendanceStatus == 'NOT_PRESENT').length}',
+                      isActive: state.statusFilter == 'NOT_PRESENT',
+                    ),
+                  ),
                 ],
+              ),
+            ),
+
+            // ── Date Picker Row ───────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              child: GestureDetector(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime.now(), // Restrict to today max
+                    locale: const Locale('ar'),
+                    builder: (c, child) => Theme(
+                      data: Theme.of(c).copyWith(
+                        colorScheme: const ColorScheme.light(primary: AppColors.primary),
+                      ),
+                      child: child!,
+                    ),
+                  );
+                  if (picked != null) {
+                    setState(() => _selectedDate = picked);
+                    ref.read(subordinatesProvider.notifier).load(checkDate: _dateFmt.format(picked));
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.primary),
+                      const SizedBox(width: 10),
+                      Text(
+                        'تاريخ اليومية:',
+                        style: GoogleFonts.ibmPlexSansArabic(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _dateFmt.format(_selectedDate),
+                        style: GoogleFonts.ibmPlexSansArabic(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_drop_down_rounded, color: AppColors.textTertiary),
+                    ],
+                  ),
+                ),
               ),
             ),
             
@@ -233,112 +331,13 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-      builder: (_) => _EmployeeActionSheet(employee: emp, parentRef: ref),
-    );
-  }
-
-  void _handleAction(
-      BuildContext context, Employee employee, _ActionType action) {
-    // Leave actions → bottom sheet
-    const leaveMap = {
-      _ActionType.annualLeave:    _LeaveInfo(3,  'إجازة سنوية'),
-      _ActionType.casualLeave:    _LeaveInfo(24, 'إجازة عارضة'),
-      _ActionType.deductionLeave: _LeaveInfo(25, 'إجازة بالخصم'),
-      _ActionType.compensatory:   _LeaveInfo(81, 'إجازة بدل يعوض'),
-    };
-
-    if (leaveMap.containsKey(action)) {
-      final info = leaveMap[action]!;
-      _showLeaveSheet(context, employee, info.id, info.label);
-      return;
-    }
-
-    switch (action) {
-      case _ActionType.absence:
-        _showAbsenceSheet(context, employee);
-        break;
-      case _ActionType.mission:
-        _showComingSoon(context, 'المأمورية');
-        break;
-      case _ActionType.workPermit:
-        _showComingSoon(context, 'تصريح عمل');
-        break;
-      case _ActionType.overtime:
-        _showOvertimeSheet(context, employee);
-        break;
-      case _ActionType.recall:
-        _showComingSoon(context, 'استدعاء');
-        break;
-      default:
-        break;
-    }
-  }
-
-  void _showOvertimeSheet(BuildContext ctx, Employee emp) {
-    showModalBottomSheet(
-      context: ctx,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => _OvertimeBottomSheet(employee: emp, ref: ref),
-    );
-  }
-
-  void _showAbsenceSheet(BuildContext ctx, Employee emp) {
-    showModalBottomSheet(
-      context: ctx,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => _AbsenceBottomSheet(employee: emp, ref: ref),
-    );
-  }
-
-  void _showLeaveSheet(BuildContext ctx, Employee emp, int typeId, String typeName) {
-    showModalBottomSheet(
-      context: ctx,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => _LeaveBottomSheet(
+      builder: (_) => _EmployeeActionSheet(
         employee: emp,
-        leaveTypeId: typeId,
-        leaveTypeName: typeName,
-        ref: ref,
+        parentRef: ref,
+        selectedDate: _selectedDate,
       ),
     );
   }
-
-  void _showComingSoon(BuildContext context, String label) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$label — قريباً', style: GoogleFonts.ibmPlexSansArabic()),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  Action Types
-// ─────────────────────────────────────────────────────────────────────────────
-enum _ActionType {
-  absence,
-  annualLeave,
-  casualLeave,
-  deductionLeave,
-  mission,
-  compensatory,
-  workPermit,
-  overtime,
-  recall,
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -352,7 +351,8 @@ class _EmployeeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initials = employee.fullNameAr.split(' ').where((w) => w.isNotEmpty).take(2).map((w) => w[0]).join();
+    final nameParts = employee.fullNameAr.trim().split(' ').where((w) => w.isNotEmpty).toList();
+    final initials = nameParts.isEmpty ? '?' : nameParts.take(2).map((w) => w[0]).join();
 
     return GestureDetector(
       onTap: onTap,
@@ -445,6 +445,43 @@ class _EmployeeCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                  if (employee.attendanceStatusAr != null && employee.attendanceStatusAr!.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (employee.checkInTime != null && employee.checkInTime != '-') ...[
+                          Icon(Icons.access_time_rounded, size: 12, color: AppColors.primary),
+                          const SizedBox(width: 4),
+                          Text(
+                            employee.checkInTime!,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: _getStatusColor(employee.attendanceStatus).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: _getStatusColor(employee.attendanceStatus).withValues(alpha: 0.2)),
+                          ),
+                          child: Text(
+                            employee.attendanceStatusAr!,
+                            style: GoogleFonts.ibmPlexSansArabic(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: _getStatusColor(employee.attendanceStatus),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -479,9 +516,9 @@ class _EmployeeCard extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 4),
                       Text(
-                        employee.employeeStatus ?? 'يعمل',
+                        employee.employeeStatus ?? 'غير معروف',
                         style: GoogleFonts.ibmPlexSansArabic(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -498,6 +535,23 @@ class _EmployeeCard extends StatelessWidget {
       ),
     );
   }
+
+  Color _getStatusColor(String? status) {
+    switch (status) {
+      case 'PRESENT_COMPLETE':
+        return AppColors.success;
+      case 'PRESENT_NO_OUT':
+        return AppColors.primary;
+      case 'LEAVE':
+        return AppColors.warning;
+      case 'ABSENT':
+        return AppColors.danger;
+      case 'NOT_PRESENT':
+      default:
+        return AppColors.textTertiary;
+    }
+  }
+
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -597,12 +651,23 @@ class _FilterTab extends StatelessWidget {
 class _EmployeeActionSheet extends StatelessWidget {
   final Employee employee;
   final WidgetRef parentRef;
+  final DateTime selectedDate;
 
-  const _EmployeeActionSheet({required this.employee, required this.parentRef});
+  const _EmployeeActionSheet({
+    required this.employee,
+    required this.parentRef,
+    required this.selectedDate,
+  });
+
+  bool get _hasPunched =>
+      employee.checkInTime != null &&
+      employee.checkInTime != '-' &&
+      employee.checkInTime!.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
-    final initials = employee.fullNameAr.split(' ').where((w) => w.isNotEmpty).take(2).map((w) => w[0]).join();
+    final nameParts = employee.fullNameAr.trim().split(' ').where((w) => w.isNotEmpty).toList();
+    final initials = nameParts.isEmpty ? '?' : nameParts.take(2).map((w) => w[0]).join();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 24),
@@ -675,25 +740,34 @@ class _EmployeeActionSheet extends StatelessWidget {
                   ),
                 ),
 
-                // Actions (Pin, Close)
-                Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.push_pin_rounded, color: Colors.white, size: 18),
-                ),
-                const SizedBox(width: 8),
+                // Actions (Eye, Calendar)
                 GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    GoRouter.of(context).push(RouteNames.employeeDetails, extra: employee);
+                  },
                   child: Container(
                     width: 36, height: 36,
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
+                      color: AppColors.infoLight,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 18),
+                    child: const Icon(Icons.remove_red_eye_rounded, color: AppColors.info, size: 18),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                    GoRouter.of(context).push(RouteNames.employeeAttendance, extra: employee);
+                  },
+                  child: Container(
+                    width: 36, height: 36,
+                    decoration: BoxDecoration(
+                      color: AppColors.primarySurface,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.calendar_month_rounded, color: AppColors.primary, size: 18),
                   ),
                 ),
               ],
@@ -702,184 +776,136 @@ class _EmployeeActionSheet extends StatelessWidget {
           
           const SizedBox(height: 24),
 
-          // Primary Action: Annual Leave
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-                _showLeaveSheet(context, employee, 3, 'إجازة سنوية');
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, Color(0xFFE53935)],
-                    begin: Alignment.centerRight,
-                    end: Alignment.centerLeft,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
-                    )
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    // Right Icon
-                    Container(
-                      width: 44, height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.beach_access_rounded, color: Colors.white),
-                    ),
-                    const SizedBox(width: 16),
-                    
-                    // Texts
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'طلب إجازة سنوية',
-                            style: GoogleFonts.ibmPlexSansArabic(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            'الرصيد المتاح: 18 يوم', // Placeholder for now
-                            style: GoogleFonts.ibmPlexSansArabic(
-                              fontSize: 12,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Left Chevron
-                    const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 28),
-                  ],
-                ),
+          if (_hasPunched) ...[
+            // Actions if employee has punched in
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  Expanded(child: _ActionGridItem(
+                    icon: Icons.more_time_rounded,
+                    label: 'إضافي',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showOvertimeSheet(context, employee);
+                    },
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _ActionGridItem(
+                    icon: Icons.beach_access_rounded,
+                    label: 'سنوية (نصف يوم)',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showLeaveSheet(context, employee, 3, 'إجازة سنوية (نصف يوم)', halfDay: true);
+                    },
+                  )),
+                ],
               ),
             ),
-          ),
+          ] else ...[
+            // Actions if employee has NOT punched in
+            // ── Primary Actions Row: سنوية + عارضة + غياب ──────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  Expanded(child: _ActionGridItem(
+                    icon: Icons.beach_access_rounded,
+                    label: 'سنوية',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showLeaveSheet(context, employee, 3, 'إجازة سنوية');
+                    },
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _ActionGridItem(
+                    icon: Icons.free_breakfast_rounded,
+                    label: 'عارضة',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showLeaveSheet(context, employee, 24, 'إجازة عارضة');
+                    },
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _ActionGridItem(
+                    icon: Icons.event_busy_rounded,
+                    label: 'غياب',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showAbsenceSheet(context, employee);
+                    },
+                  )),
+                ],
+              ),
+            ),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
-          // Secondary Actions Grid
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Expanded(child: _ActionGridItem(
-                  icon: Icons.free_breakfast_rounded,
-                  label: 'عارضة',
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showLeaveSheet(context, employee, 24, 'إجازة عارضة');
-                  },
-                )),
-                const SizedBox(width: 12),
-                Expanded(child: _ActionGridItem(
-                  icon: Icons.more_time_rounded,
-                  label: 'إضافي',
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showOvertimeSheet(context, employee);
-                  },
-                )),
-                const SizedBox(width: 12),
-                Expanded(child: _ActionGridItem(
-                  icon: Icons.swap_horiz_rounded,
-                  label: 'بدل يعوض',
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showLeaveSheet(context, employee, 81, 'إجازة بدل يعوض');
-                  },
-                )),
-              ],
+            // ── Secondary Actions Row ───────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  Expanded(child: _ActionGridItem(
+                    icon: Icons.money_off_rounded,
+                    label: 'بالخصم',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showLeaveSheet(context, employee, 25, 'إجازة بالخصم');
+                    },
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _ActionGridItem(
+                    icon: Icons.swap_horiz_rounded,
+                    label: 'بدل يعوض',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showLeaveSheet(context, employee, 81, 'إجازة بدل يعوض');
+                    },
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _ActionGridItem(
+                    icon: Icons.directions_walk_rounded,
+                    label: 'مأمورية',
+                    onTap: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('المأمورية — قريباً')));
+                    },
+                  )),
+                ],
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 12),
-          
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Expanded(child: _ActionGridItem(
-                  icon: Icons.event_busy_rounded,
-                  label: 'غياب',
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showAbsenceSheet(context, employee);
-                  },
-                )),
-                const SizedBox(width: 12),
-                Expanded(child: _ActionGridItem(
-                  icon: Icons.money_off_rounded,
-                  label: 'بالخصم',
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showLeaveSheet(context, employee, 25, 'إجازة بالخصم');
-                  },
-                )),
-                const SizedBox(width: 12),
-                Expanded(child: _ActionGridItem(
-                  icon: Icons.directions_walk_rounded,
-                  label: 'مأمورية',
-                  onTap: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('المأمورية — قريباً')));
-                  },
-                )),
-              ],
+            
+            const SizedBox(height: 12),
+
+            // ── Tertiary Actions Row ───────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  Expanded(child: _ActionGridItem(
+                    icon: Icons.call_rounded,
+                    label: 'استدعاء',
+                    onTap: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('استدعاء — قريباً')));
+                    },
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: const SizedBox.shrink()),
+                  const SizedBox(width: 10),
+                  Expanded(child: const SizedBox.shrink()),
+                ],
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 12),
-          
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Expanded(child: _ActionGridItem(
-                  icon: Icons.call_rounded,
-                  label: 'استدعاء',
-                  onTap: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('استدعاء — قريباً')));
-                  },
-                )),
-                const SizedBox(width: 12),
-                Expanded(child: _ActionGridItem(
-                  icon: Icons.assignment_ind_rounded,
-                  label: 'تصريح',
-                  onTap: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تصريح — قريباً')));
-                  },
-                )),
-                const SizedBox(width: 12),
-                Expanded(child: const SizedBox.shrink()), // Empty spacer for alignment
-              ],
-            ),
-          ),
+          ],
         ],
       ),
     );
   }
 
   // Wrappers to call the existing bottom sheets from the global namespace or parent ref
-  void _showLeaveSheet(BuildContext ctx, Employee emp, int typeId, String typeName) {
+  void _showLeaveSheet(BuildContext ctx, Employee emp, int typeId, String typeName, {bool halfDay = false}) {
     showModalBottomSheet(
       context: ctx,
       isScrollControlled: true,
@@ -891,6 +917,7 @@ class _EmployeeActionSheet extends StatelessWidget {
         employee: emp,
         leaveTypeId: typeId,
         leaveTypeName: typeName,
+        halfDay: halfDay,
         ref: parentRef,
       ),
     );
@@ -959,27 +986,20 @@ class _ActionGridItem extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  Leave Info helper
-// ─────────────────────────────────────────────────────────────────────────────
-class _LeaveInfo {
-  final int id;
-  final String label;
-  const _LeaveInfo(this.id, this.label);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 //  Leave Bottom Sheet
 // ─────────────────────────────────────────────────────────────────────────────
 class _LeaveBottomSheet extends StatefulWidget {
   final Employee employee;
   final int leaveTypeId;
   final String leaveTypeName;
+  final bool halfDay;
   final WidgetRef ref;
 
   const _LeaveBottomSheet({
     required this.employee,
     required this.leaveTypeId,
     required this.leaveTypeName,
+    this.halfDay = false,
     required this.ref,
   });
 
@@ -995,6 +1015,7 @@ class _LeaveBottomSheetState extends State<_LeaveBottomSheet> {
   final _fmt = DateFormat('dd/MM/yyyy');
 
   int get _days => _endDate.difference(_startDate).inDays + 1;
+  double get _totalLeaveDays => widget.halfDay ? 0.5 : _days.toDouble();
 
   @override
   void dispose() {
@@ -1032,23 +1053,35 @@ class _LeaveBottomSheetState extends State<_LeaveBottomSheet> {
   Future<void> _submit() async {
     setState(() => _isSubmitting = true);
     try {
-      final auth = widget.ref.read(authStateProvider);
-      final repo = widget.ref.read(leavesRepositoryProvider);
-      final result = await repo.createLeaveRequest(
-        employeeId: widget.employee.employeeId,
-        leaveTypeId: widget.leaveTypeId,
-        startDate: _fmt.format(_startDate),
-        endDate: _fmt.format(_endDate),
-        totalLeaveDays: _days,
-        notes: _notesController.text.trim(),
-        username: auth.user?.username ?? '',
-        userId: auth.user?.userId ?? 0,
+      // Read managerId from secure storage
+      const storage = FlutterSecureStorage();
+      final idStr = await storage.read(key: StorageKeys.userEmployeeId);
+      final managerId = int.tryParse(idStr ?? '') ?? 0;
+      final usernameStr = await storage.read(key: StorageKeys.username);
+
+      final dio = DioClient().dio;
+      final response = await dio.post(
+        ApiConstants.createLeaveRequestWithManager,
+        data: {
+          'employeeId': widget.employee.employeeId,
+          'managerId': managerId,
+          'leaveTypeId': widget.leaveTypeId,
+          'startDate': _fmt.format(_startDate),
+          'endDate': _fmt.format(_endDate),
+          'totalLeaveDays': _totalLeaveDays,
+          'weekendDays': 0,
+          'officialHolidays': 0,
+          'workingDays': 0,
+          'leaveReason': widget.leaveTypeName,
+          'emergencyPhone': '',
+          'username': usernameStr ?? '',
+        },
       );
 
       if (!mounted) return;
       Navigator.pop(context);
 
-      final data = result;
+      final data = response.data as Map<String, dynamic>;
       final isSuccess = data['status'] == 'success';
       final msg = data['messageAr'] ?? (isSuccess ? 'تم بنجاح' : 'حدث خطأ');
 
@@ -1143,8 +1176,12 @@ class _LeaveBottomSheetState extends State<_LeaveBottomSheet> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              'عدد الأيام: $_days ${_days == 1 ? "يوم" : "أيام"}',
-              style: GoogleFonts.ibmPlexSansArabic(fontSize: 13, fontWeight: FontWeight.w600,
+              widget.halfDay
+                  ? 'عدد الأيام: نصف يوم'
+                  : 'عدد الأيام: $_days ${_days == 1 ? "يوم" : "أيام"}',
+              style: GoogleFonts.ibmPlexSansArabic(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.info),
               textAlign: TextAlign.center,
             ),

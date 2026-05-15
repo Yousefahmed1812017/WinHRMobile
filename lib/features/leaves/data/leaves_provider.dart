@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../auth/data/auth_provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../../core/constants/storage_keys.dart';
 import 'leaves_repository.dart';
 import 'models/leave_request_model.dart';
 
@@ -50,16 +51,22 @@ class LeaveRequestsListState {
 class LeaveRequestsListNotifier
     extends StateNotifier<LeaveRequestsListState> {
   final LeavesRepository _repo;
-  final AuthState _authState;
 
-  LeaveRequestsListNotifier(this._repo, this._authState)
+  LeaveRequestsListNotifier(this._repo)
       : super(const LeaveRequestsListState());
+
+  /// Reads managerId from secure storage (same pattern as Subordinates).
+  Future<int?> _getManagerId() async {
+    const storage = FlutterSecureStorage();
+    final idStr = await storage.read(key: StorageKeys.userEmployeeId);
+    return int.tryParse(idStr ?? '');
+  }
 
   /// Load all leave requests (no filter), but use managerId if applicable.
   Future<void> loadAll() async {
     state = state.copyWith(isLoading: true, clearError: true, clearSearch: true);
     try {
-      final managerId = _authState.user?.employeeId;
+      final managerId = await _getManagerId();
       final response = await _repo.getLeaveRequests(managerId: managerId);
       state = state.copyWith(
         requests: response.data,
@@ -86,7 +93,11 @@ class LeaveRequestsListNotifier
       clearError: true,
     );
     try {
-      final response = await _repo.getLeaveRequests(employeeCode: code);
+      final managerId = await _getManagerId();
+      final response = await _repo.getLeaveRequests(
+        employeeCode: code,
+        managerId: managerId,
+      );
       state = state.copyWith(
         requests: response.data,
         pagination: response.pagination,
@@ -108,8 +119,11 @@ class LeaveRequestsListNotifier
       searchCode: employeeCode,
     );
     try {
-      final response =
-          await _repo.getLeaveRequests(employeeCode: employeeCode);
+      final managerId = await _getManagerId();
+      final response = await _repo.getLeaveRequests(
+        employeeCode: employeeCode,
+        managerId: managerId,
+      );
       state = state.copyWith(
         requests: response.data,
         pagination: response.pagination,
@@ -128,8 +142,7 @@ class LeaveRequestsListNotifier
 
 final leaveRequestsListProvider = StateNotifierProvider<
     LeaveRequestsListNotifier, LeaveRequestsListState>((ref) {
-  return LeaveRequestsListNotifier(
-      ref.read(leavesRepositoryProvider), ref.read(authStateProvider));
+  return LeaveRequestsListNotifier(ref.read(leavesRepositoryProvider));
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -180,8 +193,15 @@ class EmployeeLeaveRequestsNotifier
   Future<void> load(String employeeCode) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final response =
-          await _repo.getLeaveRequests(employeeCode: employeeCode);
+      // Read managerId from secure storage
+      const storage = FlutterSecureStorage();
+      final idStr = await storage.read(key: StorageKeys.userEmployeeId);
+      final managerId = int.tryParse(idStr ?? '');
+
+      final response = await _repo.getLeaveRequests(
+        employeeCode: employeeCode,
+        managerId: managerId,
+      );
       state = state.copyWith(
         requests: response.data,
         isLoading: false,

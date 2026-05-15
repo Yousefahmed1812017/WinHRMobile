@@ -12,11 +12,10 @@ class MainShell extends StatelessWidget {
 
   static int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/leave')) return 1;
+    if (location.startsWith('/employees')) return 1;
     if (location.startsWith('/attendance')) return 2;
-    if (location.startsWith('/employees')) return 3;
-    if (location.startsWith('/profile')) return 4;
-    return 0; // home is default/fallback or 0
+    if (location.startsWith('/profile')) return 3;
+    return 0; // home
   }
 
   @override
@@ -51,11 +50,11 @@ class MainShell extends StatelessWidget {
                   onTap: () => context.go(RouteNames.home),
                 ),
                 _NavItem(
-                  icon: Icons.event_note_outlined,
-                  activeIcon: Icons.event_note_rounded,
-                  label: 'الإجازات',
+                  icon: Icons.people_alt_outlined,
+                  activeIcon: Icons.people_alt_rounded,
+                  label: 'الموظفين',
                   isActive: currentIndex == 1,
-                  onTap: () => context.go(RouteNames.leaveRequests),
+                  onTap: () => context.go(RouteNames.employees),
                 ),
                 _NavItem(
                   icon: Icons.fingerprint_outlined,
@@ -65,17 +64,10 @@ class MainShell extends StatelessWidget {
                   onTap: () => context.go(RouteNames.attendance),
                 ),
                 _NavItem(
-                  icon: Icons.people_alt_outlined,
-                  activeIcon: Icons.people_alt_rounded,
-                  label: 'الموظفين',
-                  isActive: currentIndex == 3,
-                  onTap: () => context.go(RouteNames.employees),
-                ),
-                _NavItem(
                   icon: Icons.person_outline_rounded,
                   activeIcon: Icons.person_rounded,
                   label: 'حسابي',
-                  isActive: currentIndex == 4,
+                  isActive: currentIndex == 3,
                   onTap: () => context.go(RouteNames.profile),
                 ),
               ],

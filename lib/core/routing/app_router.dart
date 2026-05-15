@@ -9,6 +9,7 @@ import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/employees/presentation/screens/employees_list_screen.dart';
 import '../../features/employees/presentation/screens/employee_details_screen.dart';
+import '../../features/employees/presentation/screens/employee_attendance_screen.dart';
 import '../../features/employees/data/models/employee_model.dart';
 import '../../features/attendance/presentation/screens/attendance_screen.dart';
 import '../../features/leaves/presentation/screens/leave_requests_screen.dart';
@@ -78,6 +79,13 @@ class AppRouter {
         builder: (context, state) {
           final employee = state.extra as Employee;
           return EmployeeDetailsScreen(employee: employee);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.employeeAttendance,
+        builder: (context, state) {
+          final employee = state.extra as Employee;
+          return EmployeeAttendanceScreen(employee: employee);
         },
       ),
       GoRoute(

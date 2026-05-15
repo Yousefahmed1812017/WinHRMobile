@@ -167,6 +167,8 @@ class SubordinatesState {
   final bool isLoading;
   final String? errorMessage;
   final String searchQuery;
+  final String? checkDate;
+  final String? statusFilter; // 'ALL', 'LEAVE', 'ABSENT', 'PRESENT_COMPLETE', 'PRESENT_NO_OUT', 'NOT_PRESENT'
 
   const SubordinatesState({
     this.employees = const [],
@@ -174,6 +176,8 @@ class SubordinatesState {
     this.isLoading = false,
     this.errorMessage,
     this.searchQuery = '',
+    this.checkDate,
+    this.statusFilter = 'ALL',
   });
 
   SubordinatesState copyWith({
@@ -182,6 +186,8 @@ class SubordinatesState {
     bool? isLoading,
     String? errorMessage,
     String? searchQuery,
+    String? checkDate,
+    String? statusFilter,
     bool clearError = false,
   }) {
     return SubordinatesState(
@@ -190,15 +196,31 @@ class SubordinatesState {
       isLoading: isLoading ?? this.isLoading,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       searchQuery: searchQuery ?? this.searchQuery,
+      checkDate: checkDate ?? this.checkDate,
+      statusFilter: statusFilter ?? this.statusFilter,
     );
   }
 
   List<Employee> get filtered {
-    if (searchQuery.isEmpty) return employees;
-    final q = searchQuery.toLowerCase();
-    return employees.where((e) =>
-        e.code.contains(q) ||
-        e.fullNameAr.toLowerCase().contains(q)).toList();
+    var result = employees;
+
+    // Apply status filter
+    if (statusFilter != null && statusFilter != 'ALL') {
+      if (statusFilter == 'PRESENT') {
+        result = result.where((e) => e.attendanceStatus == 'PRESENT_COMPLETE' || e.attendanceStatus == 'PRESENT_NO_OUT').toList();
+      } else {
+        result = result.where((e) => e.attendanceStatus == statusFilter).toList();
+      }
+    }
+
+    // Apply search query
+    if (searchQuery.isNotEmpty) {
+      final q = searchQuery.toLowerCase();
+      result = result.where((e) =>
+          e.code.contains(q) ||
+          e.fullNameAr.toLowerCase().contains(q)).toList();
+    }
+    return result;
   }
 }
 
@@ -207,7 +229,10 @@ class SubordinatesNotifier extends StateNotifier<SubordinatesState> {
 
   SubordinatesNotifier(this._repo) : super(const SubordinatesState());
 
-  Future<void> load() async {
+  Future<void> load({String? checkDate}) async {
+    if (checkDate != null) {
+      state = state.copyWith(checkDate: checkDate);
+    }
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       const storage = FlutterSecureStorage();
@@ -218,7 +243,10 @@ class SubordinatesNotifier extends StateNotifier<SubordinatesState> {
             isLoading: false, errorMessage: 'لم يتم العثور على بيانات المدير');
         return;
       }
-      final response = await _repo.getSubordinates(managerId: managerId);
+      final response = await _repo.getSubordinates(
+        managerId: managerId,
+        checkDate: state.checkDate,
+      );
       state = state.copyWith(
         isLoading: false,
         employees: response.employees,
@@ -235,6 +263,10 @@ class SubordinatesNotifier extends StateNotifier<SubordinatesState> {
 
   void clearSearch() {
     state = state.copyWith(searchQuery: '');
+  }
+
+  void setStatusFilter(String status) {
+    state = state.copyWith(statusFilter: status);
   }
 }
 
