@@ -27,6 +27,8 @@ class ApiConstants {
   static const String checkInOut = 'Functions/check-in-out';
   static const String updateLeaveStatus = 'Functions/UpdateleaveStatus';
   static const String createCto = 'Functions/CreateCtoTransactions';
+  static const String createMission = 'Functions/CreateMission';
+  static const String createWorkPermit = 'Functions/CreateWorkPermits';
 
   // ── Pending Approvals ──────────────────────────────────────────────────
   static const String pendingApprovals = 'Query/PendingApprovals';

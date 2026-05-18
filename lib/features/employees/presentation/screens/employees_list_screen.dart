@@ -776,129 +776,183 @@ class _EmployeeActionSheet extends StatelessWidget {
           
           const SizedBox(height: 24),
 
-          if (_hasPunched) ...[
-            // Actions if employee has punched in
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: [
-                  Expanded(child: _ActionGridItem(
-                    icon: Icons.more_time_rounded,
-                    label: 'إضافي',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showOvertimeSheet(context, employee);
-                    },
-                  )),
-                  const SizedBox(width: 10),
-                  Expanded(child: _ActionGridItem(
-                    icon: Icons.beach_access_rounded,
-                    label: 'سنوية (نصف يوم)',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showLeaveSheet(context, employee, 3, 'إجازة سنوية (نصف يوم)', halfDay: true);
-                    },
-                  )),
-                ],
-              ),
-            ),
-          ] else ...[
-            // Actions if employee has NOT punched in
-            // ── Primary Actions Row: سنوية + عارضة + غياب ──────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: [
-                  Expanded(child: _ActionGridItem(
-                    icon: Icons.beach_access_rounded,
-                    label: 'سنوية',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showLeaveSheet(context, employee, 3, 'إجازة سنوية');
-                    },
-                  )),
-                  const SizedBox(width: 10),
-                  Expanded(child: _ActionGridItem(
-                    icon: Icons.free_breakfast_rounded,
-                    label: 'عارضة',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showLeaveSheet(context, employee, 24, 'إجازة عارضة');
-                    },
-                  )),
-                  const SizedBox(width: 10),
-                  Expanded(child: _ActionGridItem(
-                    icon: Icons.event_busy_rounded,
-                    label: 'غياب',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showAbsenceSheet(context, employee);
-                    },
-                  )),
-                ],
-              ),
-            ),
+          // ── Past Day Guard ────────────────────────────────────────────
+          Builder(builder: (context) {
+            final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+            final sel = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+            final isToday = sel == today;
 
-            const SizedBox(height: 12),
+            if (!isToday) {
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF7ED),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFFED7AA)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.lock_clock_rounded,
+                        color: Color(0xFFEA580C), size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('يوم منتهي',
+                              style: GoogleFonts.ibmPlexSansArabic(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFFEA580C))),
+                          const SizedBox(height: 2),
+                          Text(
+                            'لا يمكن إضافة أي إجراء على يوم سابق.\nالإجراءات متاحة ليوم اليوم فقط.',
+                            style: GoogleFonts.ibmPlexSansArabic(
+                                fontSize: 12,
+                                color: const Color(0xFF9A3412)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
 
-            // ── Secondary Actions Row ───────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: [
-                  Expanded(child: _ActionGridItem(
-                    icon: Icons.money_off_rounded,
-                    label: 'بالخصم',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showLeaveSheet(context, employee, 25, 'إجازة بالخصم');
-                    },
-                  )),
-                  const SizedBox(width: 10),
-                  Expanded(child: _ActionGridItem(
-                    icon: Icons.swap_horiz_rounded,
-                    label: 'بدل يعوض',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showLeaveSheet(context, employee, 81, 'إجازة بدل يعوض');
-                    },
-                  )),
-                  const SizedBox(width: 10),
-                  Expanded(child: _ActionGridItem(
-                    icon: Icons.directions_walk_rounded,
-                    label: 'مأمورية',
-                    onTap: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('المأمورية — قريباً')));
-                    },
-                  )),
+            // ── Today: show all actions ───────────────────────────────
+            return Column(
+              children: [
+                if (_hasPunched) ...[  
+                  // Actions if employee has punched in
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      children: [
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.more_time_rounded,
+                          label: 'إضافي',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showOvertimeSheet(context, employee);
+                          },
+                        )),
+                        const SizedBox(width: 10),
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.beach_access_rounded,
+                          label: 'سنوية (نصف يوم)',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showLeaveSheet(context, employee, 3, 'إجازة سنوية (نصف يوم)', halfDay: true);
+                          },
+                        )),
+                      ],
+                    ),
+                  ),
+                ] else ...[  
+                  // ── Primary Actions Row ──────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      children: [
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.beach_access_rounded,
+                          label: 'سنوية',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showLeaveSheet(context, employee, 3, 'إجازة سنوية');
+                          },
+                        )),
+                        const SizedBox(width: 10),
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.free_breakfast_rounded,
+                          label: 'عارضة',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showLeaveSheet(context, employee, 24, 'إجازة عارضة');
+                          },
+                        )),
+                        const SizedBox(width: 10),
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.event_busy_rounded,
+                          label: 'غياب',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showAbsenceSheet(context, employee);
+                          },
+                        )),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // ── Secondary Actions Row ────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      children: [
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.money_off_rounded,
+                          label: 'بالخصم',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showLeaveSheet(context, employee, 25, 'إجازة بالخصم');
+                          },
+                        )),
+                        const SizedBox(width: 10),
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.swap_horiz_rounded,
+                          label: 'بدل يعوض',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showLeaveSheet(context, employee, 81, 'إجازة بدل يعوض');
+                          },
+                        )),
+                        const SizedBox(width: 10),
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.directions_walk_rounded,
+                          label: 'مأمورية',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showMissionSheet(context, employee);
+                          },
+                        )),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // ── Tertiary Actions Row ─────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      children: [
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.call_rounded,
+                          label: 'استدعاء',
+                          onTap: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('استدعاء — قريباً')));
+                          },
+                        )),
+                        const SizedBox(width: 10),
+                        Expanded(child: _ActionGridItem(
+                          icon: Icons.assignment_rounded,
+                          label: 'تصريح',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showWorkPermitSheet(context, employee);
+                          },
+                        )),
+                        const SizedBox(width: 10),
+                        Expanded(child: const SizedBox.shrink()),
+                      ],
+                    ),
+                  ),
                 ],
-              ),
-            ),
-            
-            const SizedBox(height: 12),
-
-            // ── Tertiary Actions Row ───────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: [
-                  Expanded(child: _ActionGridItem(
-                    icon: Icons.call_rounded,
-                    label: 'استدعاء',
-                    onTap: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('استدعاء — قريباً')));
-                    },
-                  )),
-                  const SizedBox(width: 10),
-                  Expanded(child: const SizedBox.shrink()),
-                  const SizedBox(width: 10),
-                  Expanded(child: const SizedBox.shrink()),
-                ],
-              ),
-            ),
-          ],
+              ],
+            );
+          }),  // end Builder
         ],
       ),
     );
@@ -944,6 +998,30 @@ class _EmployeeActionSheet extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => _AbsenceBottomSheet(employee: emp, ref: parentRef),
+    );
+  }
+
+  void _showMissionSheet(BuildContext ctx, Employee emp) {
+    showModalBottomSheet(
+      context: ctx,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _MissionBottomSheet(employee: emp, ref: parentRef),
+    );
+  }
+
+  void _showWorkPermitSheet(BuildContext ctx, Employee emp) {
+    showModalBottomSheet(
+      context: ctx,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _WorkPermitBottomSheet(employee: emp, ref: parentRef),
     );
   }
 }
@@ -1025,7 +1103,8 @@ class _LeaveBottomSheetState extends State<_LeaveBottomSheet> {
 
   Future<void> _pickDate(bool isStart) async {
     final initial = isStart ? _startDate : _endDate;
-    final first = isStart ? DateTime(2020) : _startDate;
+    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final first = isStart ? today : (_startDate.isAfter(today) ? _startDate : today);
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
@@ -1290,7 +1369,8 @@ class _AbsenceBottomSheetState extends State<_AbsenceBottomSheet> {
 
   Future<void> _pickDate(bool isStart) async {
     final initial = isStart ? _startDate : _endDate;
-    final first = isStart ? DateTime(2020) : _startDate;
+    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final first = isStart ? today : (_startDate.isAfter(today) ? _startDate : today);
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
@@ -1519,6 +1599,7 @@ class _OvertimeBottomSheetState extends State<_OvertimeBottomSheet> {
   
   // 1 = يعوض (compensate), 2 = إضافي (overtime)
   int _selectedType = 1;
+  int _ctoHours = 4; // default 4, max 8
 
   @override
   void dispose() {
@@ -1526,27 +1607,9 @@ class _OvertimeBottomSheetState extends State<_OvertimeBottomSheet> {
     super.dispose();
   }
 
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-      locale: const Locale('ar'),
-      builder: (c, child) => Theme(
-        data: Theme.of(c).copyWith(
-          colorScheme: const ColorScheme.light(primary: AppColors.primary),
-        ),
-        child: child!,
-      ),
-    );
-    if (picked == null) return;
-    setState(() => _date = picked);
-  }
+  // Date is locked to today — no picker needed
 
   Future<void> _submit() async {
-    if (_selectedType == 2) return; // Should not happen since disabled
-    
     setState(() => _isSubmitting = true);
     try {
       final auth = widget.ref.read(authStateProvider);
@@ -1556,6 +1619,8 @@ class _OvertimeBottomSheetState extends State<_OvertimeBottomSheet> {
         data: {
           'employeeId': widget.employee.employeeId,
           'ctoDate': _fmt.format(_date),
+          'ctoTransactionTypeId': _selectedType,
+          'ctoHours': _selectedType == 2 ? _ctoHours : 4,
           'notes': _notesController.text.trim(),
           'userId': auth.user?.userId ?? 0,
           'createdBy': auth.user?.username ?? '',
@@ -1654,20 +1719,8 @@ class _OvertimeBottomSheetState extends State<_OvertimeBottomSheet> {
                 child: RadioListTile<int>(
                   value: 2,
                   groupValue: _selectedType,
-                  onChanged: null, // Disabled
-                  title: Row(
-                    children: [
-                      Text('إضافي ', style: GoogleFonts.ibmPlexSansArabic(fontSize: 14, color: AppColors.textTertiary)),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.warning.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text('قريباً', style: GoogleFonts.ibmPlexSansArabic(fontSize: 9, color: AppColors.warning)),
-                      ),
-                    ],
-                  ),
+                  onChanged: (val) => setState(() => _selectedType = val!),
+                  title: Text('إضافي', style: GoogleFonts.ibmPlexSansArabic(fontSize: 14)),
                   activeColor: AppColors.primary,
                   contentPadding: EdgeInsets.zero,
                   dense: true,
@@ -1677,10 +1730,9 @@ class _OvertimeBottomSheetState extends State<_OvertimeBottomSheet> {
           ),
           const SizedBox(height: 16),
 
-          // Date Picker
-          GestureDetector(
-            onTap: _pickDate,
-            child: Container(
+          // Hours stepper — only for إضافي
+          if (_selectedType == 2) ...[            
+            Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -1689,14 +1741,67 @@ class _OvertimeBottomSheetState extends State<_OvertimeBottomSheet> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.primary),
+                  const Icon(Icons.schedule_rounded, size: 18, color: AppColors.accent),
                   const SizedBox(width: 10),
-                  Text('التاريخ:', style: GoogleFonts.ibmPlexSansArabic(fontSize: 13, color: AppColors.textSecondary)),
-                  const SizedBox(width: 8),
-                  Text(_fmt.format(_date), style: GoogleFonts.ibmPlexSansArabic(
-                      fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                  Text('عدد الساعات الإضافية:',
+                      style: GoogleFonts.ibmPlexSansArabic(fontSize: 13, color: AppColors.textSecondary)),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: _ctoHours > 4 ? () => setState(() => _ctoHours--) : null,
+                    child: Container(
+                      width: 32, height: 32,
+                      decoration: BoxDecoration(
+                        color: _ctoHours > 4 ? AppColors.primarySurface : AppColors.surfaceVariant,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.remove_rounded, size: 18,
+                          color: _ctoHours > 4 ? AppColors.primary : AppColors.textTertiary),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('$_ctoHours',
+                        style: GoogleFonts.ibmPlexSansArabic(
+                            fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                  ),
+                  GestureDetector(
+                    onTap: _ctoHours < 8 ? () => setState(() => _ctoHours++) : null,
+                    child: Container(
+                      width: 32, height: 32,
+                      decoration: BoxDecoration(
+                        color: _ctoHours < 8 ? AppColors.primarySurface : AppColors.surfaceVariant,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.add_rounded, size: 18,
+                          color: _ctoHours < 8 ? AppColors.primary : AppColors.textTertiary),
+                    ),
+                  ),
                 ],
               ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Date — locked to today only
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today_rounded, size: 18, color: AppColors.primary),
+                const SizedBox(width: 10),
+                Text('التاريخ:', style: GoogleFonts.ibmPlexSansArabic(fontSize: 13, color: AppColors.textSecondary)),
+                const SizedBox(width: 8),
+                Text(_fmt.format(_date), style: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                const Spacer(),
+                Text('اليوم فقط', style: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 11, color: AppColors.textTertiary)),
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -1731,6 +1836,567 @@ class _OvertimeBottomSheetState extends State<_OvertimeBottomSheet> {
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                 : Text('حفظ وتسجيل', style: GoogleFonts.ibmPlexSansArabic(
                     fontSize: 16, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Mission Bottom Sheet
+// ─────────────────────────────────────────────────────────────────────────────
+class _MissionBottomSheet extends StatefulWidget {
+  final Employee employee;
+  final WidgetRef ref;
+  const _MissionBottomSheet({required this.employee, required this.ref});
+
+  @override
+  State<_MissionBottomSheet> createState() => _MissionBottomSheetState();
+}
+
+class _MissionBottomSheetState extends State<_MissionBottomSheet> {
+  final _fmt = DateFormat('dd/MM/yyyy');
+  final _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+  late DateTime _startDate;
+  late DateTime _endDate;
+  final _destinationController = TextEditingController();
+  final _purposeController = TextEditingController();
+  bool _isSubmitting = false;
+  String _missionType = 'INTERNAL'; // INTERNAL or EXTERNAL
+
+  @override
+  void initState() {
+    super.initState();
+    _startDate = _today;
+    _endDate = _today;
+  }
+
+  @override
+  void dispose() {
+    _destinationController.dispose();
+    _purposeController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate(bool isStart) async {
+    final first = isStart ? _today : (_startDate.isAfter(_today) ? _startDate : _today);
+    final initial = isStart ? _startDate : _endDate;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: first,
+      lastDate: DateTime(2030),
+      locale: const Locale('ar'),
+      builder: (c, child) => Theme(
+        data: Theme.of(c).copyWith(
+          colorScheme: const ColorScheme.light(primary: AppColors.primary),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked == null) return;
+    setState(() {
+      if (isStart) {
+        _startDate = picked;
+        if (_endDate.isBefore(_startDate)) _endDate = _startDate;
+      } else {
+        _endDate = picked;
+      }
+    });
+  }
+
+  int get _days => _endDate.difference(_startDate).inDays + 1;
+
+  Future<void> _submit() async {
+    final dest = _destinationController.text.trim();
+    final purpose = _purposeController.text.trim();
+    if (dest.isEmpty || purpose.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('يرجى تعبئة الوجهة والغرض من المأمورية',
+            style: GoogleFonts.ibmPlexSansArabic()),
+        backgroundColor: AppColors.warning,
+        behavior: SnackBarBehavior.floating,
+      ));
+      return;
+    }
+    setState(() => _isSubmitting = true);
+    try {
+      final auth = widget.ref.read(authStateProvider);
+      final dio = DioClient().dio;
+      final response = await dio.post(
+        ApiConstants.createMission,
+        data: {
+          'employeeId': widget.employee.employeeId,
+          'missionType': _missionType,
+          'startDate': _fmt.format(_startDate),
+          'endDate': _fmt.format(_endDate),
+          'destination': dest,
+          'missionPurpose': purpose,
+          'username': auth.user?.username ?? '',
+          'userId': auth.user?.userId ?? 0,
+        },
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      final data = response.data as Map<String, dynamic>;
+      final isSuccess = data['status'] == 'success';
+      final msg = data['messageAr'] ?? (isSuccess ? 'تم تسجيل المأمورية بنجاح' : 'حدث خطأ');
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(msg, style: GoogleFonts.ibmPlexSansArabic()),
+        backgroundColor: isSuccess ? AppColors.success : AppColors.danger,
+        behavior: SnackBarBehavior.floating,
+      ));
+    } on DioException catch (e) {
+      if (!mounted) return;
+      final msg = (e.response?.data as Map<String, dynamic>?)?['messageAr'] ??
+          'تعذّر الاتصال بالسيرفر';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(msg, style: GoogleFonts.ibmPlexSansArabic()),
+        backgroundColor: AppColors.danger,
+        behavior: SnackBarBehavior.floating,
+      ));
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 16, 20, bottom + 20),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Handle
+            Center(
+              child: Container(
+                width: 40, height: 4,
+                decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2)),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Header
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: const Color(0xFFF0FDF4),
+                      borderRadius: BorderRadius.circular(12)),
+                  child: const Icon(Icons.directions_walk_rounded,
+                      color: Color(0xFF16A34A), size: 24),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('تسجيل مأمورية',
+                          style: GoogleFonts.ibmPlexSansArabic(
+                              fontSize: 16, fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary)),
+                      Text(widget.employee.fullNameAr,
+                          style: GoogleFonts.ibmPlexSansArabic(
+                              fontSize: 12, color: AppColors.textSecondary)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Mission Type Toggle
+            Text('نوع المأمورية',
+                style: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 13, fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(child: _typeButton('INTERNAL', 'داخلية', Icons.location_city_rounded)),
+                const SizedBox(width: 10),
+                Expanded(child: _typeButton('EXTERNAL', 'خارجية', Icons.flight_takeoff_rounded)),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Date Pickers
+            Text('الفترة الزمنية',
+                style: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 13, fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(child: _dateCard('من', _fmt.format(_startDate), () => _pickDate(true))),
+                const SizedBox(width: 10),
+                Expanded(child: _dateCard('إلى', _fmt.format(_endDate), () => _pickDate(false))),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                  color: AppColors.infoLight,
+                  borderRadius: BorderRadius.circular(8)),
+              child: Text(
+                'مدة المأمورية: $_days ${_days == 1 ? "يوم" : "أيام"}',
+                style: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 13, fontWeight: FontWeight.w600,
+                    color: AppColors.info),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Destination
+            Text('الوجهة',
+                style: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 13, fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary)),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _destinationController,
+              style: GoogleFonts.ibmPlexSansArabic(fontSize: 14),
+              decoration: InputDecoration(
+                hintText: 'مثال: القاهرة، الإسكندرية...',
+                hintStyle: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 13, color: AppColors.textTertiary),
+                prefixIcon: const Icon(Icons.location_on_rounded,
+                    color: AppColors.primary, size: 20),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                filled: true,
+                fillColor: AppColors.surfaceVariant,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Purpose
+            Text('الغرض من المأمورية',
+                style: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 13, fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary)),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _purposeController,
+              style: GoogleFonts.ibmPlexSansArabic(fontSize: 14),
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'صف غرض المأمورية...',
+                hintStyle: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 13, color: AppColors.textTertiary),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                filled: true,
+                fillColor: AppColors.surfaceVariant,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Submit
+            ElevatedButton(
+              onPressed: _isSubmitting ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF16A34A),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+              child: _isSubmitting
+                  ? const SizedBox(
+                      width: 24, height: 24,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : Text('تسجيل المأمورية',
+                      style: GoogleFonts.ibmPlexSansArabic(
+                          fontSize: 16, fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _typeButton(String value, String label, IconData icon) {
+    final selected = _missionType == value;
+    return GestureDetector(
+      onTap: () => setState(() => _missionType = value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF16A34A) : AppColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+              color: selected
+                  ? const Color(0xFF16A34A)
+                  : AppColors.border),
+        ),
+        child: Column(
+          children: [
+            Icon(icon,
+                size: 22,
+                color: selected ? Colors.white : AppColors.textSecondary),
+            const SizedBox(height: 4),
+            Text(label,
+                style: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? Colors.white : AppColors.textSecondary)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _dateCard(String label, String date, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label,
+                style: GoogleFonts.ibmPlexSansArabic(
+                    fontSize: 11, color: AppColors.textTertiary)),
+            const SizedBox(height: 2),
+            Row(children: [
+              const Icon(Icons.calendar_today_rounded,
+                  size: 14, color: AppColors.primary),
+              const SizedBox(width: 6),
+              Text(date,
+                  style: GoogleFonts.ibmPlexSansArabic(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary)),
+            ]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Work Permit Bottom Sheet
+// ─────────────────────────────────────────────────────────────────────────────
+class _WorkPermitBottomSheet extends StatefulWidget {
+  final Employee employee;
+  final WidgetRef ref;
+  const _WorkPermitBottomSheet({required this.employee, required this.ref});
+
+  @override
+  State<_WorkPermitBottomSheet> createState() => _WorkPermitBottomSheetState();
+}
+
+class _WorkPermitBottomSheetState extends State<_WorkPermitBottomSheet> {
+  final _fmt = DateFormat('dd/MM/yyyy');
+  final _notesController = TextEditingController();
+  bool _isSubmitting = false;
+  final DateTime _permitDate = DateTime.now();
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    setState(() => _isSubmitting = true);
+    try {
+      final auth = widget.ref.read(authStateProvider);
+      final dio = DioClient().dio;
+      final response = await dio.post(
+        ApiConstants.createWorkPermit,
+        data: {
+          'employeeId': widget.employee.employeeId,
+          'permitDate': _fmt.format(_permitDate),
+          'notes': _notesController.text.trim(),
+          'username': auth.user?.username ?? '',
+          'userId': auth.user?.userId ?? 0,
+        },
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      final data = response.data as Map<String, dynamic>;
+      final isSuccess = data['status'] == 'success';
+      final msg = data['messageAr'] ?? (isSuccess ? 'تم إصدار التصريح بنجاح' : 'حدث خطأ');
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(msg, style: GoogleFonts.ibmPlexSansArabic()),
+        backgroundColor: isSuccess ? AppColors.success : AppColors.danger,
+        behavior: SnackBarBehavior.floating,
+      ));
+    } on DioException catch (e) {
+      if (!mounted) return;
+      final msg = (e.response?.data as Map<String, dynamic>?)?['messageAr'] ??
+          'تعذّر الاتصال بالسيرفر';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(msg, style: GoogleFonts.ibmPlexSansArabic()),
+        backgroundColor: AppColors.danger,
+        behavior: SnackBarBehavior.floating,
+      ));
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 16, 20, bottom + 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Handle
+          Center(
+            child: Container(
+              width: 40, height: 4,
+              decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2)),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: const Color(0xFFFFF7ED),
+                    borderRadius: BorderRadius.circular(12)),
+                child: const Icon(Icons.assignment_rounded,
+                    color: Color(0xFFEA580C), size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('تصريح عمل',
+                        style: GoogleFonts.ibmPlexSansArabic(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary)),
+                    Text(widget.employee.fullNameAr,
+                        style: GoogleFonts.ibmPlexSansArabic(
+                            fontSize: 12, color: AppColors.textSecondary)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Date — locked to today
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today_rounded,
+                    size: 18, color: Color(0xFFEA580C)),
+                const SizedBox(width: 10),
+                Text('تاريخ التصريح:',
+                    style: GoogleFonts.ibmPlexSansArabic(
+                        fontSize: 13, color: AppColors.textSecondary)),
+                const SizedBox(width: 8),
+                Text(_fmt.format(_permitDate),
+                    style: GoogleFonts.ibmPlexSansArabic(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary)),
+                const Spacer(),
+                Text('اليوم فقط',
+                    style: GoogleFonts.ibmPlexSansArabic(
+                        fontSize: 11, color: AppColors.textTertiary)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Notes
+          Text('ملاحظات (اختياري)',
+              style: GoogleFonts.ibmPlexSansArabic(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary)),
+          const SizedBox(height: 6),
+          TextField(
+            controller: _notesController,
+            style: GoogleFonts.ibmPlexSansArabic(fontSize: 14),
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'أسباب إصدار التصريح...',
+              hintStyle: GoogleFonts.ibmPlexSansArabic(
+                  fontSize: 13, color: AppColors.textTertiary),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              filled: true,
+              fillColor: AppColors.surfaceVariant,
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Submit
+          ElevatedButton(
+            onPressed: _isSubmitting ? null : _submit,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEA580C),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: _isSubmitting
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2))
+                : Text('إصدار التصريح',
+                    style: GoogleFonts.ibmPlexSansArabic(
+                        fontSize: 16, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
