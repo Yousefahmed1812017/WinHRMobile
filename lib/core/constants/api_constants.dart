@@ -5,7 +5,7 @@ class ApiConstants {
 
   // ── Base URL ──────────────────────────────────────────────────────────
   static const String baseUrl =
-      'http://deltamansoura.ddns.net:9090/ords/deltaamaindata/';
+      'https://semadapi.locksys.co/ords/deltaamaindata/';
 
   // ── Timeouts ──────────────────────────────────────────────────────────
   static const Duration connectTimeout = Duration(seconds: 30);
