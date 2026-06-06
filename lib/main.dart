@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'core/services/notification_service.dart';
+
 import 'app.dart';
 
 Future<void> main() async {
@@ -22,6 +24,13 @@ Future<void> main() async {
 
   // ── Hive (local cache) ──────────────────────────────────────────────
   await Hive.initFlutter();
+
+  // ── Firebase & FCM Notifications ─────────────────────────────────────
+  try {
+    await NotificationService.initialize();
+  } catch (e) {
+    debugPrint('[main.dart] Error initializing NotificationService: $e');
+  }
 
   // ── Run App ─────────────────────────────────────────────────────────
   runApp(

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "989532333366",
+    "project_id": "delta-hr-e5fb2",
+    "storage_bucket": "delta-hr-e5fb2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:989532333366:android:256477cc6fc68b42587f97",
+        "android_client_info": {
+          "package_name": "com.example.win_hr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2ahinekkjyinOAUsGp3mTvz_f1rnJ7sQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -49,6 +49,11 @@ dependencies:
   geolocator: ^11.0.0
   local_auth: ^2.1.8
 
+  # Firebase Notifications
+  firebase_core: ^3.0.0
+  firebase_messaging: ^15.0.0
+  flutter_local_notifications: ^17.0.0
+
   # Utils
   freezed_annotation: ^2.4.1
   json_annotation: ^4.8.1
