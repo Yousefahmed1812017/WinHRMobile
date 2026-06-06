@@ -124,11 +124,30 @@ class _DailyLogsScreenState extends ConsumerState<DailyLogsScreen> {
               pinned: true,
               floating: true,
               snap: true,
+              stretch: true,
+              expandedHeight: 190,
               elevation: 0,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
+                ),
+              ),
+              flexibleSpace: FlexibleSpaceBar(
+                stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
+                background: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.primaryDark, AppColors.primary, AppColors.primaryLight],
+                      stops: [0.0, 0.55, 1.0],
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(32),
+                      bottomRight: Radius.circular(32),
+                    ),
+                  ),
                 ),
               ),
               leading: IconButton(
@@ -610,23 +629,33 @@ class _EmployeeCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Name + Status badge
+                      // Name — full row
+                      Text(
+                        record.fullName,
+                        style: GoogleFonts.ibmPlexSansArabic(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      // Code + day name + status badge on same row
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(
                             child: Text(
-                              record.fullName,
-                              style: GoogleFonts.ibmPlexSansArabic(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
+                              '#${record.code}${record.dayNameAr.isNotEmpty ? '  •  ${record.dayNameAr}' : ''}',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textTertiary,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
@@ -645,16 +674,6 @@ class _EmployeeCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 3),
-                      // Code + day name
-                      Text(
-                        '#${record.code}${record.dayNameAr.isNotEmpty ? '  •  ${record.dayNameAr}' : ''}',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textTertiary,
-                        ),
-                      ),
                       // Times row
                       if (record.checkInTime != '-' || record.checkOutTime != '-') ...[
                         const SizedBox(height: 9),
@@ -662,6 +681,7 @@ class _EmployeeCard extends StatelessWidget {
                           children: [
                             if (record.checkInTime != '-')
                               _TimeChip(
+                                label: 'دخول',
                                 time: record.checkInTime,
                                 icon: Icons.login_rounded,
                                 color: AppColors.success,
@@ -670,6 +690,7 @@ class _EmployeeCard extends StatelessWidget {
                               const SizedBox(width: 8),
                             if (record.checkOutTime != '-')
                               _TimeChip(
+                                label: 'خروج',
                                 time: record.checkOutTime,
                                 icon: Icons.logout_rounded,
                                 color: AppColors.danger,
@@ -776,30 +797,51 @@ class _FilterTab extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 class _TimeChip extends StatelessWidget {
   final String time;
+  final String label;
   final IconData icon;
   final Color color;
 
-  const _TimeChip({required this.time, required this.icon, required this.color});
+  const _TimeChip({
+    required this.time,
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(8),
+        color: color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: color),
-          const SizedBox(width: 4),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 10, color: color.withValues(alpha: 0.75)),
+              const SizedBox(width: 3),
+              Text(
+                label,
+                style: GoogleFonts.ibmPlexSansArabic(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
+                  color: color.withValues(alpha: 0.75),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
           Text(
             time,
             style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
               color: color,
             ),
           ),
@@ -879,7 +921,7 @@ class _StatCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(icon, size: 13, color: color),
+              Icon(icon, size: 10, color: color),
               const SizedBox(width: 5),
               Text(
                 '$count',
@@ -1057,6 +1099,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.more_time_rounded,
                           label: 'إضافي',
+                          color: AppColors.success,
                           onTap: () {
                             Navigator.pop(context);
                             _showOvertimeSheet(context, employee);
@@ -1066,6 +1109,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.beach_access_rounded,
                           label: 'سنوية (نصف يوم)',
+                          color: AppColors.info,
                           onTap: () {
                             Navigator.pop(context);
                             _showLeaveSheet(context, employee, 3, 'إجازة سنوية (نصف يوم)', halfDay: true);
@@ -1082,6 +1126,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.beach_access_rounded,
                           label: 'سنوية',
+                          color: AppColors.info,
                           onTap: () {
                             Navigator.pop(context);
                             _showLeaveSheet(context, employee, 3, 'إجازة سنوية');
@@ -1091,6 +1136,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.free_breakfast_rounded,
                           label: 'عارضة',
+                          color: AppColors.warning,
                           onTap: () {
                             Navigator.pop(context);
                             _showLeaveSheet(context, employee, 24, 'إجازة عارضة');
@@ -1100,6 +1146,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.event_busy_rounded,
                           label: 'غياب',
+                          color: AppColors.danger,
                           onTap: () {
                             Navigator.pop(context);
                             _showAbsenceSheet(context, employee);
@@ -1116,6 +1163,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.money_off_rounded,
                           label: 'بالخصم',
+                          color: const Color(0xFF7C3AED),
                           onTap: () {
                             Navigator.pop(context);
                             _showLeaveSheet(context, employee, 25, 'إجازة بالخصم');
@@ -1125,6 +1173,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.swap_horiz_rounded,
                           label: 'بدل يعوض',
+                          color: const Color(0xFF0891B2),
                           onTap: () {
                             Navigator.pop(context);
                             _showLeaveSheet(context, employee, 81, 'إجازة بدل يعوض');
@@ -1134,6 +1183,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.directions_walk_rounded,
                           label: 'مأمورية',
+                          color: AppColors.textSecondary,
                           onTap: () {
                             Navigator.pop(context);
                             _showMissionSheet(context, employee);
@@ -1150,6 +1200,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.call_rounded,
                           label: 'استدعاء',
+                          color: AppColors.primary,
                           onTap: () {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -1160,6 +1211,7 @@ class _EmployeeActionSheet extends StatelessWidget {
                         Expanded(child: _ActionGridItem(
                           icon: Icons.assignment_rounded,
                           label: 'تصريح',
+                          color: const Color(0xFFD97706),
                           onTap: () {
                             Navigator.pop(context);
                             _showWorkPermitSheet(context, employee);
@@ -1250,11 +1302,13 @@ class _ActionGridItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final Color color;
 
   const _ActionGridItem({
     required this.icon,
     required this.label,
     required this.onTap,
+    this.color = AppColors.primary,
   });
 
   @override
@@ -1262,37 +1316,38 @@ class _ActionGridItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: const Color(0xFFFFEBEE), // Subtle light red/rose border matching AppColors.primarySurface
-            width: 1.5,
-          ),
+          color: color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: color.withValues(alpha: 0.18), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: color.withValues(alpha: 0.07),
               blurRadius: 8,
-              offset: const Offset(0, 4),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: AppColors.primary, // Unified professional theme brand deep red
-              size: 24,
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 22),
             ),
             const SizedBox(height: 8),
             Text(
               label,
               style: GoogleFonts.ibmPlexSansArabic(
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary, // Navy text
+                color: AppColors.textPrimary,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

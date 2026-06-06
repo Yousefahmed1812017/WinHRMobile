@@ -4,6 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../constants/api_constants.dart';
 import '../constants/storage_keys.dart';
+import '../routing/app_router.dart';
+import '../routing/route_names.dart';
 
 /// Injects the JWT Bearer token into every outgoing request.
 class AuthInterceptor extends Interceptor {
@@ -43,6 +45,56 @@ class AuthInterceptor extends Interceptor {
     }
 
     return handler.next(options);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) async {
+    // Skip checking for login endpoint responses
+    if (response.requestOptions.path.contains(ApiConstants.login)) {
+      return handler.next(response);
+    }
+
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      final code = data['code'];
+      final message = data['message']?.toString() ?? '';
+      final messageAr = data['messageAr']?.toString() ?? '';
+
+      // Check for token expired / unauthorized / PL/SQL value error (which happens on expired/invalid tokens)
+      final isUnauthorized = code == 401 ||
+          message.contains('Unauthorized') ||
+          messageAr.contains('غير مصرح') ||
+          message.contains('ORA-06502') ||
+          messageAr.contains('خطأ داخلي في الخادم') ||
+          message.contains('token') ||
+          messageAr.contains('التوكن');
+
+      if (isUnauthorized) {
+        debugPrint('[AuthInterceptor] Unauthorized or Expired token detected in response body: $data');
+        debugPrint('[AuthInterceptor] Clearing storage and redirecting to Login screen...');
+        
+        // Clear secure storage
+        await _secureStorage.deleteAll();
+        
+        // Redirect to login screen
+        AppRouter.router.go(RouteNames.login);
+        
+        // Reject the request as an unauthorized error
+        handler.reject(
+          DioException(
+            requestOptions: response.requestOptions,
+            response: Response(
+              requestOptions: response.requestOptions,
+              statusCode: 401,
+              data: response.data,
+            ),
+            type: DioExceptionType.badResponse,
+          ),
+        );
+        return;
+      }
+    }
+    return handler.next(response);
   }
 
   @override
