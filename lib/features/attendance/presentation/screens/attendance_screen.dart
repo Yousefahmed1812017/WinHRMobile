@@ -121,6 +121,28 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
       final dio = DioClient().dio;
       final now = DateTime.now();
 
+      final bool isFake = _position!.isMocked;
+      double realLat = _position!.latitude;
+      double realLng = _position!.longitude;
+      double fakeLat = 0.0;
+      double fakeLng = 0.0;
+
+      if (isFake) {
+        fakeLat = _position!.latitude;
+        fakeLng = _position!.longitude;
+        try {
+          final realPos = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high,
+            forceAndroidLocationManager: true,
+          );
+          realLat = realPos.latitude;
+          realLng = realPos.longitude;
+        } catch (_) {
+          realLat = 0.0;
+          realLng = 0.0;
+        }
+      }
+
       final response = await dio.post(
         ApiConstants.checkInOut,
         data: {
@@ -128,11 +150,14 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
           'checkType': checkType,
           'actualTime': _timeFmt.format(now),
           'attendanceDate': _dateFmt.format(now),
-          'latitude': _position!.latitude,
-          'longitude': _position!.longitude,
+          'LATITUDE': realLat,
+          'LONGITUDE': realLng,
+          'isFake': isFake ? 1 : 0,
+          'fakelatitudee': fakeLat,
+          'fakeLongitude': fakeLng,
           'createdBy': auth.user?.username ?? '',
           'userId': auth.user?.userId ?? 0,
-          'notes': _position!.isMocked ? 'Fake GPS' : '',
+          'notes': isFake ? 'Fake GPS' : '',
         },
       );
 
@@ -300,6 +325,51 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
                 ),
               ),
 
+            // ── Fake GPS Warning ────────────────────────────────────
+            if (_position != null && _position!.isMocked) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.danger.withValues(alpha: 0.4)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.location_off_rounded, size: 22, color: AppColors.danger),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'تحذير: موقع وهمي مكتشف',
+                            style: GoogleFonts.ibmPlexSansArabic(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.danger,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'تم اكتشاف استخدام تطبيق موقع وهمي. سيتم تسجيل هذا الحضور كموقع مزيف.',
+                            style: GoogleFonts.ibmPlexSansArabic(
+                              fontSize: 11,
+                              color: AppColors.danger,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
             const SizedBox(height: 24),
 
             // ── Action Buttons ──────────────────────────────────────
@@ -451,7 +521,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
                 child: CircularProgressIndicator(
                     color: AppColors.primary, strokeWidth: 2));
           },
-          errorBuilder: (_, __, ___) => Center(
+          errorBuilder: (context, err, stack) => Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

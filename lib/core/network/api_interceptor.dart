@@ -24,7 +24,22 @@ class AuthInterceptor extends Interceptor {
 
     final token = await _secureStorage.read(key: StorageKeys.accessToken);
     if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+      // Clean and normalize token
+      var cleanToken = token.trim();
+      if (cleanToken.startsWith('"') && cleanToken.endsWith('"')) {
+        cleanToken = cleanToken.substring(1, cleanToken.length - 1).trim();
+      }
+
+      debugPrint('[AuthInterceptor] Stored token length: ${token.length}');
+      debugPrint('[AuthInterceptor] Cleaned token: "$cleanToken"');
+
+      if (cleanToken.toLowerCase().startsWith('bearer ')) {
+        options.headers['Authorization'] = cleanToken;
+      } else {
+        options.headers['Authorization'] = 'Bearer $cleanToken';
+      }
+      
+      debugPrint('[AuthInterceptor] Header sent: Authorization: ${options.headers['Authorization']}');
     }
 
     return handler.next(options);

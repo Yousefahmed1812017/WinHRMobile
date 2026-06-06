@@ -13,6 +13,11 @@ class DailyAttendanceRecord {
   final String status;
   final String statusAr;
   final String statusClass;
+  final int isFake;
+  final double fakeLatitude;
+  final double fakeLongitude;
+  final double latitude;
+  final double longitude;
 
   const DailyAttendanceRecord({
     required this.employeeId,
@@ -26,6 +31,11 @@ class DailyAttendanceRecord {
     required this.status,
     required this.statusAr,
     required this.statusClass,
+    this.isFake = 0,
+    this.fakeLatitude = 0.0,
+    this.fakeLongitude = 0.0,
+    this.latitude = 0.0,
+    this.longitude = 0.0,
   });
 
   factory DailyAttendanceRecord.fromJson(Map<String, dynamic> json) {
@@ -41,6 +51,11 @@ class DailyAttendanceRecord {
       status: json['status'] as String? ?? '',
       statusAr: json['statusAr'] as String? ?? '',
       statusClass: json['statusClass'] as String? ?? '',
+      isFake: json['isFake'] as int? ?? 0,
+      fakeLatitude: (json['fakelatitudee'] as num?)?.toDouble() ?? 0.0,
+      fakeLongitude: (json['fakeLongitude'] as num?)?.toDouble() ?? 0.0,
+      latitude: (json['LATITUDE'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['LONGITUDE'] as num?)?.toDouble() ?? 0.0,
     );
   }
 

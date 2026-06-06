@@ -104,7 +104,6 @@ class _DailyLogsScreenState extends ConsumerState<DailyLogsScreen> {
     final state = ref.watch(dailyAttendanceProvider);
     final list = state.filtered;
 
-    // Calculate filter counts dynamically
     final allCount = state.records.length;
     final presentCount = state.records.where((r) => r.status == 'PRESENT').length;
     final leaveCount = state.records.where((r) => r.status == 'LEAVE').length;
@@ -113,6 +112,7 @@ class _DailyLogsScreenState extends ConsumerState<DailyLogsScreen> {
         r.status == 'PUBLIC_HOLIDAY' ||
         r.status == 'WEEKLY_OFF' ||
         r.status == 'COMP_DAY').length;
+    final fakeCount = state.fakeCount;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -137,13 +137,26 @@ class _DailyLogsScreenState extends ConsumerState<DailyLogsScreen> {
                   if (Navigator.canPop(context)) Navigator.pop(context);
                 },
               ),
-              title: Text(
-                'اليوميات',
-                style: GoogleFonts.ibmPlexSansArabic(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'اليوميات',
+                    style: GoogleFonts.ibmPlexSansArabic(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    DateFormat('EEEE، d MMMM yyyy', 'ar').format(state.selectedDate),
+                    style: GoogleFonts.ibmPlexSansArabic(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
               ),
               centerTitle: true,
               actions: [
@@ -312,6 +325,16 @@ class _DailyLogsScreenState extends ConsumerState<DailyLogsScreen> {
               ),
             ),
 
+            // ── Stats Summary Row ─────────────────────────────────────────
+            _StatsRow(
+              presentCount: presentCount,
+              absentCount: absentCount,
+              leaveCount: leaveCount,
+              offCount: offCount,
+              fakeCount: fakeCount,
+            ),
+            const SizedBox(height: 2),
+
             // ── Filter Tabs ───────────────────────────────────────────────
             Container(
               height: 54,
@@ -323,48 +346,40 @@ class _DailyLogsScreenState extends ConsumerState<DailyLogsScreen> {
                 children: [
                   GestureDetector(
                     onTap: () => ref.read(dailyAttendanceProvider.notifier).setStatusFilter('ALL'),
-                    child: _FilterTab(
-                      label: 'الكل',
-                      count: '$allCount',
-                      isActive: state.statusFilter == 'ALL',
-                    ),
+                    child: _FilterTab(label: 'الكل', count: '$allCount', isActive: state.statusFilter == 'ALL'),
                   ),
                   const SizedBox(width: 12),
                   GestureDetector(
                     onTap: () => ref.read(dailyAttendanceProvider.notifier).setStatusFilter('PRESENT'),
-                    child: _FilterTab(
-                      label: 'حاضر',
-                      count: '$presentCount',
-                      isActive: state.statusFilter == 'PRESENT',
-                    ),
+                    child: _FilterTab(label: 'حاضر', count: '$presentCount', isActive: state.statusFilter == 'PRESENT'),
                   ),
                   const SizedBox(width: 12),
                   GestureDetector(
                     onTap: () => ref.read(dailyAttendanceProvider.notifier).setStatusFilter('LEAVE'),
-                    child: _FilterTab(
-                      label: 'إجازة',
-                      count: '$leaveCount',
-                      isActive: state.statusFilter == 'LEAVE',
-                    ),
+                    child: _FilterTab(label: 'إجازة', count: '$leaveCount', isActive: state.statusFilter == 'LEAVE'),
                   ),
                   const SizedBox(width: 12),
                   GestureDetector(
                     onTap: () => ref.read(dailyAttendanceProvider.notifier).setStatusFilter('ABSENT'),
-                    child: _FilterTab(
-                      label: 'غائب',
-                      count: '$absentCount',
-                      isActive: state.statusFilter == 'ABSENT',
-                    ),
+                    child: _FilterTab(label: 'غائب', count: '$absentCount', isActive: state.statusFilter == 'ABSENT'),
                   ),
                   const SizedBox(width: 12),
                   GestureDetector(
                     onTap: () => ref.read(dailyAttendanceProvider.notifier).setStatusFilter('OFF_DAYS'),
-                    child: _FilterTab(
-                      label: 'عطلات',
-                      count: '$offCount',
-                      isActive: state.statusFilter == 'OFF_DAYS',
-                    ),
+                    child: _FilterTab(label: 'عطلات', count: '$offCount', isActive: state.statusFilter == 'OFF_DAYS'),
                   ),
+                  if (fakeCount > 0) ...[
+                    const SizedBox(width: 12),
+                    GestureDetector(
+                      onTap: () => ref.read(dailyAttendanceProvider.notifier).setStatusFilter('FAKE_LOCATION'),
+                      child: _FilterTab(
+                        label: 'موقع وهمي',
+                        count: '$fakeCount',
+                        isActive: state.statusFilter == 'FAKE_LOCATION',
+                        accentColor: AppColors.warning,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -474,174 +489,214 @@ class _EmployeeCard extends StatelessWidget {
 
   const _EmployeeCard({required this.record, required this.onTap});
 
+  String get _initials {
+    final words = record.fullName.trim().split(RegExp(r'\s+'));
+    if (words.isEmpty || words.first.isEmpty) return '؟';
+    if (words.length == 1) return words.first.substring(0, 1);
+    return words.first.substring(0, 1) + words[1].substring(0, 1);
+  }
+
   @override
   Widget build(BuildContext context) {
     final statusColor = record.getStatusColor();
 
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: record.isFake == 1
+              ? AppColors.warning.withValues(alpha: 0.5)
+              : AppColors.border.withValues(alpha: 0.6),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: (record.isFake == 1 ? AppColors.warning : Colors.black)
+                .withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Custom Avatar (Right in RTL)
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.08),
-                  shape: BoxShape.circle,
+          // Fake GPS warning banner
+          if (record.isFake == 1)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.1),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                child: Icon(
-                  Icons.person_rounded,
-                  size: 26,
-                  color: statusColor,
+                border: Border(
+                  bottom: BorderSide(color: AppColors.warning.withValues(alpha: 0.2)),
                 ),
               ),
-              Positioned(
-                top: 0,
-                right: -2,
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(Icons.location_off_rounded, size: 12, color: Colors.white),
                   ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 16),
-
-          // Middle (Name, Code, Status Badge, Prominent Times)
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  record.fullName,
-                  style: GoogleFonts.ibmPlexSansArabic(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                  const SizedBox(width: 8),
+                  Text(
+                    'موقع GPS وهمي مكتشف',
+                    style: GoogleFonts.ibmPlexSansArabic(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFFB45309),
+                    ),
                   ),
-                  textAlign: TextAlign.right,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '#${record.code}',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                
-                // Row for Status Badge
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: statusColor.withValues(alpha: 0.2)),
-                      ),
-                      child: Text(
-                        record.statusAr,
-                        style: GoogleFonts.ibmPlexSansArabic(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: statusColor,
-                        ),
+                  if (record.fakeLatitude != 0.0) ...[
+                    const Spacer(),
+                    Text(
+                      '${record.fakeLatitude.toStringAsFixed(4)}, ${record.fakeLongitude.toStringAsFixed(4)}',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.warning,
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 10),
+                ],
+              ),
+            ),
 
-                // Prominent Hours Display (Bigger & Pill Styled)
-                Row(
-                  children: [
-                    if (record.checkInTime != '-')
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: AppColors.success.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppColors.success.withValues(alpha: 0.15)),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.login_rounded, size: 14, color: AppColors.success),
-                            const SizedBox(width: 5),
-                            Text(
-                              'حضور: ${record.checkInTime}',
+          // Main content
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Avatar with initials
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        statusColor.withValues(alpha: 0.18),
+                        statusColor.withValues(alpha: 0.06),
+                      ],
+                    ),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: statusColor.withValues(alpha: 0.3), width: 1.5),
+                  ),
+                  child: Center(
+                    child: Text(
+                      _initials,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: statusColor,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+
+                // Employee info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name + Status badge
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              record.fullName,
                               style: GoogleFonts.ibmPlexSansArabic(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: statusColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: statusColor.withValues(alpha: 0.2)),
+                            ),
+                            child: Text(
+                              record.statusAr,
+                              style: GoogleFonts.ibmPlexSansArabic(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: statusColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 3),
+                      // Code + day name
+                      Text(
+                        '#${record.code}${record.dayNameAr.isNotEmpty ? '  •  ${record.dayNameAr}' : ''}',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textTertiary,
+                        ),
+                      ),
+                      // Times row
+                      if (record.checkInTime != '-' || record.checkOutTime != '-') ...[
+                        const SizedBox(height: 9),
+                        Row(
+                          children: [
+                            if (record.checkInTime != '-')
+                              _TimeChip(
+                                time: record.checkInTime,
+                                icon: Icons.login_rounded,
                                 color: AppColors.success,
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    if (record.checkInTime != '-' && record.checkOutTime != '-')
-                      const SizedBox(width: 8),
-                    if (record.checkOutTime != '-')
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: AppColors.danger.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppColors.danger.withValues(alpha: 0.15)),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.logout_rounded, size: 14, color: AppColors.danger),
-                            const SizedBox(width: 5),
-                            Text(
-                              'انصراف: ${record.checkOutTime}',
-                              style: GoogleFonts.ibmPlexSansArabic(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
+                            if (record.checkInTime != '-' && record.checkOutTime != '-')
+                              const SizedBox(width: 8),
+                            if (record.checkOutTime != '-')
+                              _TimeChip(
+                                time: record.checkOutTime,
+                                icon: Icons.logout_rounded,
                                 color: AppColors.danger,
                               ),
-                            ),
                           ],
                         ),
-                      ),
-                  ],
+                      ],
+                    ],
+                  ),
+                ),
+
+                // Actions button
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: onTap,
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceVariant,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.more_vert_rounded, color: AppColors.textSecondary, size: 18),
+                  ),
                 ),
               ],
             ),
-          ),
-
-          // Left side: Three dots menu button
-          IconButton(
-            icon: const Icon(Icons.more_vert_rounded, color: AppColors.textTertiary),
-            onPressed: onTap,
           ),
         ],
       ),
@@ -656,25 +711,27 @@ class _FilterTab extends StatelessWidget {
   final String label;
   final String count;
   final bool isActive;
+  final Color? accentColor;
 
-  const _FilterTab({required this.label, required this.count, required this.isActive});
+  const _FilterTab({required this.label, required this.count, required this.isActive, this.accentColor});
 
   @override
   Widget build(BuildContext context) {
+    final color = accentColor ?? AppColors.primary;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isActive ? AppColors.primary : Colors.white,
+        color: isActive ? color : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isActive ? AppColors.primary : AppColors.border,
+          color: isActive ? color : AppColors.border,
           width: 1.5,
         ),
         boxShadow: isActive
             ? [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.25),
+                  color: color.withValues(alpha: 0.25),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 )
@@ -689,14 +746,14 @@ class _FilterTab extends StatelessWidget {
             style: GoogleFonts.ibmPlexSansArabic(
               fontSize: 13,
               fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
-              color: isActive ? Colors.white : AppColors.textSecondary,
+              color: isActive ? Colors.white : (accentColor ?? AppColors.textSecondary),
             ),
           ),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: isActive ? Colors.white.withValues(alpha: 0.25) : AppColors.surfaceVariant,
+              color: isActive ? Colors.white.withValues(alpha: 0.25) : (accentColor?.withValues(alpha: 0.1) ?? AppColors.surfaceVariant),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -704,8 +761,144 @@ class _FilterTab extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: isActive ? Colors.white : AppColors.textSecondary,
+                color: isActive ? Colors.white : (accentColor ?? AppColors.textSecondary),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Time Chip
+// ─────────────────────────────────────────────────────────────────────────────
+class _TimeChip extends StatelessWidget {
+  final String time;
+  final IconData icon;
+  final Color color;
+
+  const _TimeChip({required this.time, required this.icon, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            time,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Stats Row
+// ─────────────────────────────────────────────────────────────────────────────
+class _StatsRow extends StatelessWidget {
+  final int presentCount;
+  final int absentCount;
+  final int leaveCount;
+  final int offCount;
+  final int fakeCount;
+
+  const _StatsRow({
+    required this.presentCount,
+    required this.absentCount,
+    required this.leaveCount,
+    required this.offCount,
+    required this.fakeCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 76,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        children: [
+          _StatCard(count: presentCount, label: 'حاضر', color: AppColors.success, icon: Icons.check_circle_outline_rounded),
+          _StatCard(count: absentCount, label: 'غائب', color: AppColors.danger, icon: Icons.cancel_outlined),
+          _StatCard(count: leaveCount, label: 'إجازة', color: AppColors.info, icon: Icons.beach_access_rounded),
+          _StatCard(count: offCount, label: 'عطلات', color: AppColors.textTertiary, icon: Icons.weekend_rounded),
+          if (fakeCount > 0)
+            _StatCard(count: fakeCount, label: 'موقع وهمي', color: AppColors.warning, icon: Icons.location_off_rounded),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final int count;
+  final String label;
+  final Color color;
+  final IconData icon;
+
+  const _StatCard({
+    required this.count,
+    required this.label,
+    required this.color,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 88,
+      margin: const EdgeInsets.only(right: 10, top: 4, bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(icon, size: 13, color: color),
+              const SizedBox(width: 5),
+              Text(
+                '$count',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                  height: 1,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.ibmPlexSansArabic(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: color.withValues(alpha: 0.85),
             ),
           ),
         ],

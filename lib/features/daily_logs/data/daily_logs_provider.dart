@@ -42,10 +42,11 @@ class DailyAttendanceState {
     );
   }
 
+  int get fakeCount => records.where((r) => r.isFake == 1).length;
+
   List<DailyAttendanceRecord> get filtered {
     var result = records;
 
-    // Apply status filter
     if (statusFilter != 'ALL') {
       if (statusFilter == 'PRESENT') {
         result = result.where((e) => e.status == 'PRESENT').toList();
@@ -58,10 +59,11 @@ class DailyAttendanceState {
             e.status == 'PUBLIC_HOLIDAY' ||
             e.status == 'WEEKLY_OFF' ||
             e.status == 'COMP_DAY').toList();
+      } else if (statusFilter == 'FAKE_LOCATION') {
+        result = result.where((e) => e.isFake == 1).toList();
       }
     }
 
-    // Apply search query
     if (searchQuery.isNotEmpty) {
       final q = searchQuery.toLowerCase();
       result = result.where((e) =>
