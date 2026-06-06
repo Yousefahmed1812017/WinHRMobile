@@ -18,6 +18,7 @@ class ApiConstants {
   static const String employees = 'Query/EmployeeList';
   static const String subordinates = 'Query/Subordinates';
   static const String employeeAttendanceLog = 'Query/EmployeeAttendanceLog';
+  static const String dailyAttendance = 'Query/DailyAttendance';
 
   // ── Leave Requests ─────────────────────────────────────────────────────
   static const String leaveRequests = 'Query/EmployeeLeaveRequests';
@@ -32,6 +33,6 @@ class ApiConstants {
 
   // ── Pending Approvals ──────────────────────────────────────────────────
   static const String pendingApprovals = 'Query/PendingApprovals';
-  static const String approveRejectLeave = 'leave-requests/approve-reject';
+  static const String approveRejectLeave = 'Functions/ApproveOrRejectRequest';
   static const String createLeaveRequestWithManager = 'Functions/CreateLeaveRequestWithManger';
 }

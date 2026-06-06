@@ -153,7 +153,7 @@ class EmployeesListNotifier extends StateNotifier<EmployeesListState> {
 
 /// Provides the employees list state notifier.
 final employeesListProvider =
-    StateNotifierProvider<EmployeesListNotifier, EmployeesListState>((ref) {
+    StateNotifierProvider.autoDispose<EmployeesListNotifier, EmployeesListState>((ref) {
   return EmployeesListNotifier(ref.read(employeesRepositoryProvider));
 });
 
@@ -207,7 +207,10 @@ class SubordinatesState {
     // Apply status filter
     if (statusFilter != null && statusFilter != 'ALL') {
       if (statusFilter == 'PRESENT') {
-        result = result.where((e) => e.attendanceStatus == 'PRESENT_COMPLETE' || e.attendanceStatus == 'PRESENT_NO_OUT').toList();
+        result = result.where((e) =>
+            e.attendanceStatus == 'PRESENT' ||
+            e.attendanceStatus == 'PRESENT_COMPLETE' ||
+            e.attendanceStatus == 'PRESENT_NO_OUT').toList();
       } else {
         result = result.where((e) => e.attendanceStatus == statusFilter).toList();
       }
@@ -271,6 +274,6 @@ class SubordinatesNotifier extends StateNotifier<SubordinatesState> {
 }
 
 final subordinatesProvider =
-    StateNotifierProvider<SubordinatesNotifier, SubordinatesState>((ref) {
+    StateNotifierProvider.autoDispose<SubordinatesNotifier, SubordinatesState>((ref) {
   return SubordinatesNotifier(ref.read(employeesRepositoryProvider));
 });

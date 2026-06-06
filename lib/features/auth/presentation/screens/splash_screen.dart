@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/routing/route_names.dart';
 import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../data/auth_provider.dart';
 
 /// Splash screen — clean white design with company logo and smooth animations.
 class SplashScreen extends ConsumerStatefulWidget {
@@ -116,13 +117,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       return;
     }
 
-    const storage = FlutterSecureStorage();
-    final token = await storage.read(key: StorageKeys.accessToken);
+    await ref.read(authStateProvider.notifier).checkAuth();
 
     if (!mounted) return;
 
-    if (token != null && token.isNotEmpty) {
-      context.go(RouteNames.employees);
+    final authState = ref.read(authStateProvider);
+    if (authState.status == AuthStatus.authenticated) {
+      context.go(RouteNames.home);
     } else {
       context.go(RouteNames.login);
     }

@@ -43,6 +43,7 @@ class EmployeesRepository {
     int pageSize = 50,
     String? employeeCode,
     String? checkDate,
+    String? attendanceStatus,
   }) async {
     try {
       final response = await _dio.post(
@@ -54,6 +55,7 @@ class EmployeesRepository {
               ? (int.tryParse(employeeCode) ?? employeeCode)
               : null,
           if (checkDate != null) 'checkDate': checkDate,
+          if (attendanceStatus != null) 'attendanceStatus': attendanceStatus,
           'pageNumber': pageNumber,
           'pageSize': pageSize,
         },

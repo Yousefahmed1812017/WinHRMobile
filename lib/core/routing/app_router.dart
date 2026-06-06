@@ -7,6 +7,7 @@ import '../../features/employees/presentation/screens/create_absence_screen.dart
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/daily_logs/presentation/screens/daily_logs_screen.dart';
 import '../../features/employees/presentation/screens/employees_list_screen.dart';
 import '../../features/employees/presentation/screens/employee_details_screen.dart';
 import '../../features/employees/presentation/screens/employee_attendance_screen.dart';
@@ -16,6 +17,7 @@ import '../../features/leaves/presentation/screens/leave_requests_screen.dart';
 import '../../features/leaves/presentation/screens/create_leave_request_screen.dart';
 import '../../features/leaves/presentation/screens/leave_request_details_screen.dart';
 import '../../features/leaves/data/models/leave_request_model.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../shared/widgets/main_shell.dart';
 import 'route_names.dart';
 
@@ -70,6 +72,10 @@ class AppRouter {
             path: RouteNames.profile,
             builder: (context, state) => const ProfileScreen(),
           ),
+          GoRoute(
+            path: RouteNames.dailyLogs,
+            builder: (context, state) => const DailyLogsScreen(),
+          ),
         ],
       ),
 
@@ -114,6 +120,10 @@ class AppRouter {
           final request = state.extra as LeaveRequest;
           return LeaveRequestDetailsScreen(request: request);
         },
+      ),
+      GoRoute(
+        path: RouteNames.notifications,
+        builder: (context, state) => const NotificationsScreen(),
       ),
     ],
 

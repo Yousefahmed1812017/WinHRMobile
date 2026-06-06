@@ -5,9 +5,26 @@ import 'package:win_hr/core/localization/generated/app_localizations.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'features/auth/data/auth_provider.dart';
+
 /// Root widget for Win HR.
-class WinHRApp extends StatelessWidget {
+class WinHRApp extends ConsumerStatefulWidget {
   const WinHRApp({super.key});
+
+  @override
+  ConsumerState<WinHRApp> createState() => _WinHRAppState();
+}
+
+class _WinHRAppState extends ConsumerState<WinHRApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize auth state globally on app start
+    Future.microtask(() {
+      ref.read(authStateProvider.notifier).checkAuth();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -10,6 +10,9 @@ import '../../../../core/network/dio_client.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/employee_model.dart';
 
+import '../../data/employees_provider.dart';
+import '../../../auth/data/auth_provider.dart';
+
 class CreateAbsenceScreen extends ConsumerStatefulWidget {
   final Employee employee;
   const CreateAbsenceScreen({super.key, required this.employee});
@@ -59,12 +62,16 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
   Future<void> _submit() async {
     setState(() => _isSubmitting = true);
     try {
+      final user = ref.read(authStateProvider).user;
+      
       final response = await _dio.post(
         ApiConstants.createAbsence,
         data: {
           'employeeId': widget.employee.employeeId,
           'absenceDate': _dateFormat.format(_startDate),
           'endDate': _dateFormat.format(_endDate),
+          'userId': user?.userId,
+          'username': user?.username,
         },
       );
 
@@ -72,6 +79,7 @@ class _CreateAbsenceScreenState extends ConsumerState<CreateAbsenceScreen> {
       if (!mounted) return;
 
       if (data['status'] == 'success') {
+        ref.read(subordinatesProvider.notifier).load(); // Refresh the list
         _showSuccess(data['messageAr'] ?? 'تم تسجيل الغياب بنجاح');
       } else {
         _showError(data['messageAr'] ?? 'حدث خطأ');

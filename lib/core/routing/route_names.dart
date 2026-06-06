@@ -18,4 +18,6 @@ class RouteNames {
   static const String createAbsence = '/employees/absence';
   static const String attendance = '/attendance';
   static const String profile = '/profile';
+  static const String notifications = '/notifications';
+  static const String dailyLogs = '/daily-logs';
 }

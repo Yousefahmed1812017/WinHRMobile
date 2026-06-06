@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../../../core/routing/route_names.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/data/auth_provider.dart';
 import '../../data/home_provider.dart';
@@ -127,38 +129,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
 
                     // Notification bell
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceVariant,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          const Icon(
-                            Icons.notifications_none_rounded,
-                            color: AppColors.textPrimary,
-                            size: 24,
-                          ),
-                          if (pendingState.totalRecords > 0)
-                            Positioned(
-                              top: 8,
-                              right: 9,
-                              child: Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  color: AppColors.danger,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      color: AppColors.surfaceVariant,
-                                      width: 1.5),
+                    GestureDetector(
+                      onTap: () => context.push(RouteNames.notifications),
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            const Icon(
+                              Icons.notifications_none_rounded,
+                              color: AppColors.textPrimary,
+                              size: 24,
+                            ),
+                            if (pendingState.totalRecords > 0)
+                              Positioned(
+                                top: 8,
+                                right: 9,
+                                child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.danger,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: AppColors.surfaceVariant,
+                                        width: 1.5),
+                                  ),
                                 ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -171,13 +176,78 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  _buildPendingApprovalsSection(pendingState),
+                  _buildQuickLinksSection(context),
+                  if (pendingState.approvals.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    _buildPendingApprovalsSection(pendingState),
+                  ],
                 ]),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  // ── Quick Links Section ───────────────────────────────────────────────
+  Widget _buildQuickLinksSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'الوصول السريع',
+          style: GoogleFonts.ibmPlexSansArabic(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _QuickLinkCard(
+                title: 'الموظفين',
+                icon: Icons.people_alt_outlined,
+                color: const Color(0xFF3B82F6), // Blue
+                onTap: () => context.push(RouteNames.employees),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _QuickLinkCard(
+                title: 'اليوميات',
+                icon: Icons.event_note_rounded,
+                color: const Color(0xFF8B5CF6), // Purple
+                onTap: () => context.push(RouteNames.dailyLogs),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _QuickLinkCard(
+                title: 'الحضور',
+                icon: Icons.fingerprint_rounded,
+                color: const Color(0xFF10B981), // Emerald
+                onTap: () => context.push(RouteNames.attendance),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _QuickLinkCard(
+                title: 'الإجازات',
+                icon: Icons.beach_access_outlined,
+                color: const Color(0xFFF59E0B), // Amber
+                onTap: () => context.push(RouteNames.leaveRequests),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -557,8 +627,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       const storage = FlutterSecureStorage();
       final idStr = await storage.read(key: StorageKeys.userEmployeeId);
       final approverId = int.tryParse(idStr ?? '') ?? 0;
+      final usernameStr = await storage.read(key: StorageKeys.username);
 
       final dio = DioClient().dio;
+      final auth = ref.read(authStateProvider);
       final response = await dio.post(
         ApiConstants.approveRejectLeave,
         data: {
@@ -567,6 +639,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           'approverId': approverId,
           'action': action,
           'notes': notes,
+          'username': usernameStr ?? '',
+          'userId': auth.user?.userId ?? 0,
         },
       );
 
@@ -830,6 +904,73 @@ class _PendingApprovalCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Quick Link Card
+// ─────────────────────────────────────────────────────────────────────────────
+class _QuickLinkCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickLinkCard({
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withValues(alpha: 0.1),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: GoogleFonts.ibmPlexSansArabic(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }

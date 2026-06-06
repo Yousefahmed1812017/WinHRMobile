@@ -39,21 +39,6 @@ class _EmployeeDetailsScreenState
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.push(
-            RouteNames.createLeaveRequest,
-            extra: widget.employee,
-          );
-        },
-        backgroundColor: AppColors.accent,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded, size: 20),
-        label: Text(
-          'إنشاء إجازة',
-          style: GoogleFonts.ibmPlexSansArabic(fontWeight: FontWeight.w700),
-        ),
-      ),
       body: CustomScrollView(
         slivers: [
           // ── Header ────────────────────────────────────────────────────

@@ -61,18 +61,25 @@ class AuthRepository {
           value: data['token'] as String,
         );
 
-        // Extract user info
         final user = data['user'] as Map<String, dynamic>? ?? {};
 
+        final parsedFullName = user['fullName'] ?? user['employeeName'] ?? data['fullName'] ?? data['employeeName'] ?? '';
+        final parsedEmail = user['email'] ?? user['employeeEmail'] ?? data['email'] ?? data['employeeEmail'] ?? '';
+        final parsedEmployeeId = user['employeeId'] ?? data['employeeId'];
+        final parsedEmployeeCode = user['employeeCode'] ?? data['employeeCode'];
+        final parsedRoleName = user['roleName'] ?? data['roleName'];
+        final parsedImageUrl = user['imageUrl'] ?? data['imageUrl'];
+        final parsedUserId = user['userId'] ?? data['userId'];
+
         final userData = UserData(
-          userId: user['userId'] as int? ?? 0,
-          username: user['username'] as String? ?? username,
-          fullName: user['fullName'] as String? ?? '',
-          email: user['email'] as String? ?? '',
-          imageUrl: user['imageUrl'] as String?,
-          roleName: user['roleName'] as String?,
-          employeeId: user['employeeId'] as int?,
-          employeeCode: user['employeeCode']?.toString(),
+          userId: parsedUserId != null ? int.tryParse(parsedUserId.toString()) ?? 0 : 0,
+          username: user['username'] as String? ?? data['username'] as String? ?? username,
+          fullName: parsedFullName.toString(),
+          email: parsedEmail.toString(),
+          imageUrl: parsedImageUrl?.toString(),
+          roleName: parsedRoleName?.toString(),
+          employeeId: parsedEmployeeId != null ? int.tryParse(parsedEmployeeId.toString()) : null,
+          employeeCode: parsedEmployeeCode?.toString(),
         );
 
         // Persist user data
